@@ -344,3 +344,143 @@ window.SUBJECTS = [
     ]
   }
 ];
+
+/* =====================================================================
+ * Ek içerik: yeni oyun modları için
+ *  groups : İki Kutu ve Balon Avı -> [[grupAdı, [öğeler]], [grupAdı, [öğeler]]]
+ *  words  : Gizli Kelime          -> [cevap, ipucu]
+ * ===================================================================== */
+const EXTRA = {
+  t1: {
+    groups: [
+      ["Göktürkler", ["Bumin Kağan", "Orhun Yazıtları", "Türk adını devlet adı yapma", "Bilge Kağan", "Tonyukuk", "Kül Tigin", "552'de kuruluş", "İstemi Yabgu"]],
+      ["Uygurlar", ["Bögü Kağan", "Maniheizm'i kabul", "Yerleşik hayata ilk geçiş", "Uygur alfabesi", "Matbaa kullanımı", "Kutluk Bilge Kül Kağan", "744'te kuruluş", "Savaşçı özelliklerin zayıflaması"]]
+    ],
+    words: [
+      ["KURULTAY", "Eski Türklerde devlet işlerinin görüşüldüğü meclis"],
+      ["METE HAN", "Orduda onlu sistemi kuran Asya Hun hükümdarı"],
+      ["TALAS", "751'de Türklerin Abbasilerle birlikte Çin'e karşı savaştığı yer"],
+      ["UYGURLAR", "Yerleşik hayata geçen ilk Türk devleti"],
+      ["KUT", "Yönetme yetkisinin Tanrı tarafından verildiği inancı"],
+      ["ATTİLA", "Avrupa Hun Devleti'nin en ünlü hükümdarı"]
+    ]
+  },
+  t2: {
+    groups: [
+      ["Yavuz Sultan Selim dönemi", ["Çaldıran Savaşı", "Mercidabık Savaşı", "Ridaniye Savaşı", "Halifeliğin Osmanlı'ya geçmesi", "Turnadağ Savaşı", "Mısır Seferi", "Kutsal emanetlerin İstanbul'a getirilmesi"]],
+      ["Kanuni dönemi", ["Mohaç Meydan Muharebesi", "Preveze Deniz Savaşı", "Belgrad'ın fethi (1521)", "Rodos'un fethi (1522)", "I. Viyana Kuşatması (1529)", "Amasya Antlaşması (1555)", "Zigetvar Seferi"]]
+    ],
+    words: [
+      ["DEVŞİRME", "Hristiyan ailelerin çocuklarının devlet hizmeti için yetiştirilmesi sistemi"],
+      ["FETRET", "Ankara Savaşı sonrası şehzadeler arası taht kavgası dönemi: ... Devri"],
+      ["PREVEZE", "Barbaros'un 1538'de Haçlı donanmasını yendiği deniz savaşı"],
+      ["MOHAÇ", "Kanuni'nin 1526'da Macarları yendiği meydan muharebesi"],
+      ["AKÇE", "Orhan Bey döneminde basılan ilk Osmanlı gümüş parası"],
+      ["BURSA", "Orhan Bey döneminde alınıp başkent yapılan şehir"]
+    ]
+  },
+  c1: {
+    groups: [
+      ["Karadeniz iklimi", ["Her mevsim yağışlı", "Kurak mevsim yok", "Doğal bitki örtüsü orman", "Yazları serin", "Çay ve fındık yetişir", "Rize kıyıları", "En fazla yağış alan iklim"]],
+      ["Akdeniz iklimi", ["Yazları sıcak ve kurak", "Kışları ılık ve yağışlı", "Doğal bitki örtüsü maki", "Antalya kıyıları", "Zeytin ve turunçgil yetişir", "Yaz kuraklığı belirgin", "Kızılçam ormanları"]]
+    ],
+    words: [
+      ["AĞRI", "Türkiye'nin en yüksek dağı (5137 m): ... Dağı"],
+      ["VAN", "Türkiye'nin en büyük gölü: ... Gölü"],
+      ["KIZILIRMAK", "Tamamı Türkiye'de olan en uzun akarsu"],
+      ["MAKİ", "Akdeniz ikliminin doğal bitki örtüsü"],
+      ["RİZE", "Türkiye'de en çok yağış alan il"],
+      ["KONYA", "Yüzölçümü en büyük il"],
+      ["IĞDIR", "Türkiye'nin en doğusundaki il"]
+    ]
+  },
+  c2: {
+    groups: [
+      ["Karadeniz Bölgesi", ["Çay", "Fındık", "Zonguldak taşkömürü", "Hamsi avcılığı", "Bafra tütünü", "Murgul bakırı"]],
+      ["Ege Bölgesi", ["Zeytin", "İncir", "Afyon haşhaşı", "Manisa üzümü", "Soma linyiti", "Pamukkale travertenleri"]]
+    ],
+    words: [
+      ["BOR", "Türkiye'nin dünyada en büyük rezervine sahip olduğu maden"],
+      ["GAP", "Fırat ve Dicle havzasını kapsayan kalkınma projesinin kısaltması"],
+      ["ZONGULDAK", "Taşkömürü havzası olan il"],
+      ["LÜLETAŞI", "Eskişehir'e özgü mineral"],
+      ["FINDIK", "Ordu ve Giresun'un öne çıkan tarım ürünü"],
+      ["ÇAY", "Rize'de en çok yetiştirilen tarım ürünü"]
+    ]
+  },
+  v1: {
+    groups: [
+      ["Yasama (TBMM)", ["Kanun yapmak", "Bütçe kanununu kabul etmek", "Savaş ilanına karar vermek", "Para basılmasına karar vermek", "Genel ve özel af ilanı", "Uluslararası antlaşmaların onaylanmasını uygun bulmak"]],
+      ["Yürütme (Cumhurbaşkanı)", ["Kanunları yayımlamak", "Bakanları atamak", "Cumhurbaşkanlığı kararnamesi çıkarmak", "Kanunu tekrar görüşülmek üzere TBMM'ye geri göndermek", "MGK'ya başkanlık etmek", "Büyükelçi atamak"]]
+    ],
+    words: [
+      ["KANUN-İ ESASİ", "1876'da ilan edilen ilk Osmanlı anayasası"],
+      ["YASAMA", "TBMM'ye ait olan ve devredilemeyen yetki"],
+      ["YARGI", "Bağımsız ve tarafsız mahkemelerce kullanılan yetki"],
+      ["YÜRÜTME", "Cumhurbaşkanı'na ait olan yetki"],
+      ["HALKOYLAMASI", "1982 Anayasası'nın kabul edildiği yöntem"],
+      ["ANAYASA MAHKEMESİ", "1961 Anayasası ile kurulan, 15 üyeli yüksek mahkeme"]
+    ]
+  },
+  v2: {
+    groups: [
+      ["Kamu hukuku", ["Ceza hukuku", "Anayasa hukuku", "İdare hukuku", "Vergi hukuku", "Ceza muhakemesi hukuku", "Devletler genel hukuku"]],
+      ["Özel hukuk", ["Medeni hukuk", "Borçlar hukuku", "Ticaret hukuku", "Devletler özel hukuku", "Aile hukuku", "Eşya hukuku"]]
+    ],
+    words: [
+      ["ERGİNLİK", "18 yaşın doldurulmasıyla kazanılan durum"],
+      ["ANAYASA", "Normlar hiyerarşisinin en üstündeki kural"],
+      ["ÖRF VE ADET", "Hukukun yazısız asli kaynağı"],
+      ["YERLEŞİM YERİ", "Kişinin sürekli kalma niyetiyle oturduğu yer"],
+      ["HAK EHLİYETİ", "Haklara ve borçlara sahip olabilme yeteneği"],
+      ["KISITLILIK", "Mahkeme kararıyla fiil ehliyetinin sınırlanması"]
+    ]
+  },
+  tr1: {
+    groups: [
+      ["Doğru yazım", ["yalnız", "herkes", "orijinal", "şoför", "egzoz", "kılavuz", "makine", "yanlış"]],
+      ["Yanlış yazım", ["yanlız", "herkez", "orjinal", "şöför", "egsoz", "klavuz", "makina", "yalnış"]]
+    ],
+    words: [
+      ["KILAVUZ", "Yol gösteren kişi ya da kitap (yazımına dikkat!)"],
+      ["YALNIZ", "Tek başına olan (yazımına dikkat!)"],
+      ["ORİJİNAL", "Özgün, kopya olmayan"],
+      ["EGZOZ", "Motorlu araçlarda yanmış gazları dışarı atan boru"],
+      ["ŞOFÖR", "Araç sürücüsü"],
+      ["HERKES", "Bütün insanlar"]
+    ]
+  },
+  tr2: {
+    groups: [
+      ["Ünlü düşmesi", ["ağzı", "burnu", "oğlu", "gönlü", "alnı", "karnı", "boynu", "beyni"]],
+      ["Ünsüz yumuşaması", ["kitabı", "ağacı", "kanadı", "çorabı", "köpeği", "dolabı", "yurdu", "kazancı"]]
+    ],
+    words: [
+      ["YUMUŞAMA", "p, ç, t, k seslerinin b, c, d, g/ğ'ye dönüşmesi: ünsüz ..."],
+      ["DARALMA", "başla + yor → başlıyor: ünlü ..."],
+      ["BENZEŞME", "sınıf + da → sınıfta: ünsüz ..."],
+      ["KAYNAŞTIRMA", "y, ş, s, n harflerinin görevi: ... ünsüzü"],
+      ["TÜREME", "his + i → hissi: ünsüz ..."],
+      ["DÜŞME", "ağız + ı → ağzı: ünlü ..."]
+    ]
+  }
+};
+
+// Matematik için kategoriler de üretilir
+const MATH_GROUPS = {
+  m1: () => {
+    const p = new Set(), np = new Set();
+    while (p.size < 7) { const n = R(2, 97); if (isPrime(n)) p.add(String(n)); }
+    while (np.size < 7) { const n = R(4, 99); if (!isPrime(n)) np.add(String(n)); }
+    return [["Asal sayı", [...p]], ["Asal değil", [...np]]];
+  },
+  m2: () => [
+    ["1/2'den büyük", shuf(["%60", "3/4", "0,7", "%85", "5/8", "0,9", "2/3", "%55"]).slice(0, 7)],
+    ["1/2'den küçük", shuf(["%30", "2/5", "0,25", "%45", "1/3", "0,1", "3/8", "%12"]).slice(0, 7)]
+  ]
+};
+
+for (const s of window.SUBJECTS) for (const u of s.units) {
+  Object.assign(u, EXTRA[u.id] || {});
+  if (u.gen && MATH_GROUPS[u.id]) u.gen.groups = MATH_GROUPS[u.id];
+}

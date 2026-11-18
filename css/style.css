@@ -153,3 +153,76 @@ small { color: var(--muted); }
   .qcard .q { font-size: 1.05rem; }
   .node-wrap.r { margin-left: 34%; }
 }
+
+/* ======== Oyun Salonu ======== */
+.arc { display: flex; flex-direction: column; gap: 4px; }
+.duel-card { background: linear-gradient(135deg, #c0392b, #8e44ad); }
+.tower-card { background: linear-gradient(135deg, #2980b9, #16a085); }
+.arc small { color: #fffc; }
+
+/* Düello */
+.duel { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; background: var(--card); border-radius: var(--r); padding: 10px 12px; }
+.duel .side { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.duel .side span { font-size: 1.6rem; font-weight: 800; }
+.duel .me span { color: var(--gold); } .duel .bot span { color: #ff8fa3; }
+.duel .vs { font-weight: 900; color: var(--muted); }
+.duel small.hot { color: #ffb347; font-weight: 700; } .duel small.okc { color: var(--ok); font-weight: 700; } .duel small.noc { color: var(--no); font-weight: 700; }
+.duel-line { background: #0003; border-radius: 10px; padding: 8px 10px; }
+
+/* Bilgi Kulesi */
+.tower { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+.tower span { background: #ffffff14; border-radius: 6px; text-align: center; font-size: .72rem; padding: 5px 0; font-weight: 700; color: var(--muted); }
+.tower span.safe { background: #2a5a8a; }
+.tower span.done { background: var(--ok); color: #fff; }
+.tower span.cur { background: var(--gold); color: #3a2400; transform: scale(1.15); }
+.jokers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.joker { padding: 10px 6px; font-size: .9rem; background: #43398f; }
+.opt.gone { opacity: .12 !important; }
+
+/* Hafıza */
+.memory { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mem { aspect-ratio: 1 / 1.05; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #4a35c9); font-size: 1.8rem; font-weight: 800; box-shadow: 0 4px 0 #0004; padding: 6px; display: grid; place-items: center; transition: transform .2s; }
+.mem:not(:disabled):active { transform: scale(.94); }
+.mem.up { background: #fff; color: #221c4d; font-size: .82rem; line-height: 1.25; animation: flip .3s; }
+.mem.up.s1 { background: #fff6dc; }
+.mem.found { background: #c9f7dc; color: #145a32; box-shadow: 0 0 0 3px var(--ok); }
+@keyframes flip { from { transform: rotateY(90deg); } to { transform: rotateY(0); } }
+
+/* İki Kutu */
+.sortcard { transition: transform .35s ease-in, opacity .35s, background .2s; }
+.sortcard .src { margin-top: 8px; color: #b03a2e; font-weight: 700; }
+.sortcard.fly-l { transform: translateX(-60%) rotate(-10deg); opacity: .25; }
+.sortcard.fly-r { transform: translateX(60%) rotate(10deg); opacity: .25; }
+.sortcard.flash-no.fly-l, .sortcard.flash-no.fly-r { transform: none; opacity: 1; }
+.bins { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bin { min-height: 110px; border-radius: var(--r); font-weight: 800; font-size: 1rem; padding: 12px; box-shadow: 0 6px 0 #0004; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.bin span { font-size: 1.5rem; }
+.bin.a { background: linear-gradient(160deg, #2980b9, #1c5d87); }
+.bin.b { background: linear-gradient(160deg, #d35400, #9c3d00); }
+.bin:active { transform: translateY(3px); box-shadow: 0 3px 0 #0004; }
+
+/* Balon Avı */
+.target-banner { background: linear-gradient(135deg, #f5c542, #ff8a3d); color: #3a2400; border-radius: 14px; padding: 12px; text-align: center; font-size: 1.05rem; }
+.sky { position: relative; height: 62vh; min-height: 380px; overflow: hidden; border-radius: var(--r); background: linear-gradient(#5aa9e6, #a8dcf7 70%, #d9f2ff); }
+.balloon { position: absolute; bottom: -110px; width: 40%; max-width: 150px; min-height: 84px; padding: 10px 8px; border-radius: 48% 48% 44% 44% / 55% 55% 45% 45%; color: #fff; font-weight: 800; font-size: .8rem; line-height: 1.2; text-shadow: 0 1px 2px #0006; box-shadow: inset -8px -10px 0 #0002, 0 4px 10px #0003; animation: rise linear forwards; }
+.balloon::after { content: ""; position: absolute; left: 50%; bottom: -26px; width: 2px; height: 26px; background: #fff9; }
+.balloon.popped { transition: scale .25s, opacity .25s; opacity: 0; scale: 1.6; }
+.balloon.bad { background: #333 !important; animation: none; opacity: .5; }
+@keyframes rise { to { transform: translateY(calc(-62vh - 160px)); } }
+
+/* Gizli Kelime */
+.word { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 6px 0; }
+.word .ch { width: 32px; height: 42px; border-bottom: 3px solid var(--muted); display: grid; place-items: center; font-size: 1.4rem; font-weight: 800; }
+.word .ch.show { border-color: var(--gold); animation: pop .3s; }
+.word .ch.miss { color: var(--no); }
+.word .ch.sym { border: 0; width: 14px; }
+.word .gap { width: 18px; }
+.keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
+.key { background: var(--card2); border-radius: 10px; padding: 10px 0; font-weight: 800; box-shadow: 0 3px 0 #0004; }
+.key.hit { background: var(--ok); opacity: .7; } .key.miss { background: #3a3550; opacity: .45; }
+.key:not(:disabled):active { transform: translateY(2px); }
+
+@media (max-width: 380px) {
+  .word .ch { width: 26px; height: 36px; font-size: 1.15rem; }
+  .mem.up { font-size: .74rem; }
+}
