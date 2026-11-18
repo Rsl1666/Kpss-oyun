@@ -4,7 +4,7 @@
   "description": "Oynayarak KPSS'ye hazırlan",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1b1640",
-  "theme_color": "#1b1640",
+  "background_color": "#d6f0ff",
+  "theme_color": "#d6f0ff",
   "lang": "tr"
 }

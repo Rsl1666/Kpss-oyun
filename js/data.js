@@ -35,7 +35,7 @@ const mcq = (q, ans, spread, ex) => ({ type: "mc", q, opts: numOpts(ans, spread)
 window.SUBJECTS = [
   /* ============================ TARİH ============================ */
   {
-    id: "tarih", name: "Tarih", world: "Zaman Kalesi", icon: "🏛️", color: "#e67e22",
+    id: "tarih", name: "Tarih", world: "Zaman Kalesi", icon: "🏛️", color: "#ff8a00",
     units: [
       {
         id: "t1", title: "İslamiyet Öncesi Türk Tarihi",
@@ -102,7 +102,7 @@ window.SUBJECTS = [
 
   /* ============================ COĞRAFYA ============================ */
   {
-    id: "cografya", name: "Coğrafya", world: "Anadolu Haritası", icon: "🗺️", color: "#27ae60",
+    id: "cografya", name: "Coğrafya", world: "Anadolu Haritası", icon: "🗺️", color: "#12b76a",
     units: [
       {
         id: "c1", title: "Türkiye'nin Konumu ve Fiziki Özellikleri",
@@ -163,7 +163,7 @@ window.SUBJECTS = [
 
   /* ============================ VATANDAŞLIK ============================ */
   {
-    id: "vatandaslik", name: "Vatandaşlık", world: "Anayasa Sarayı", icon: "⚖️", color: "#8e44ad",
+    id: "vatandaslik", name: "Vatandaşlık", world: "Anayasa Sarayı", icon: "⚖️", color: "#7a5af8",
     units: [
       {
         id: "v1", title: "Anayasa ve Devlet Yapısı",
@@ -227,7 +227,7 @@ window.SUBJECTS = [
 
   /* ============================ TÜRKÇE ============================ */
   {
-    id: "turkce", name: "Türkçe", world: "Kelime Ormanı", icon: "📖", color: "#2980b9",
+    id: "turkce", name: "Türkçe", world: "Kelime Ormanı", icon: "📖", color: "#0ba5ec",
     units: [
       {
         id: "tr1", title: "Yazım Kuralları",
@@ -288,7 +288,7 @@ window.SUBJECTS = [
 
   /* ============================ MATEMATİK (üretilen sorular) ============================ */
   {
-    id: "matematik", name: "Matematik", world: "Sayılar Adası", icon: "🧮", color: "#c0392b",
+    id: "matematik", name: "Matematik", world: "Sayılar Adası", icon: "🧮", color: "#f63d68",
     units: [
       {
         id: "m1", title: "Temel İşlemler ve Sayılar",

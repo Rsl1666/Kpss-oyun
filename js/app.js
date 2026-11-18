@@ -73,7 +73,7 @@
   };
 
   function confetti() {
-    const colors = ["#f1c40f", "#e74c3c", "#2ecc71", "#3498db", "#9b59b6", "#e67e22"];
+    const colors = ["#ffd23f", "#ff4d6d", "#1fc16b", "#0ba5ec", "#6c4cff", "#ff8a00"];
     for (let i = 0; i < 70; i++) {
       const c = document.createElement("i");
       c.className = "confetti";
@@ -143,13 +143,23 @@
     if (G.botTO) { clearTimeout(G.botTO); G.botTO = null; }
   }
 
+  const TAG = { tarih: "Genel Kültür", cografya: "Genel Kültür", vatandaslik: "Genel Kültür", turkce: "Genel Yetenek", matematik: "Genel Yetenek" };
+  function greeting() { const h = new Date().getHours(); return h < 11 ? "Günaydın!" : h < 18 ? "İyi çalışmalar!" : "İyi akşamlar!"; }
+
   function header() {
-    const L = levelInfo(S.xp);
-    return `<header class="top">
-      <div class="lvl"><div class="lvl-badge">${L.lvl}</div>
-        <div class="lvl-info"><b>${L.title}</b><div class="bar"><span style="width:${(L.cur / L.need) * 100}%"></span></div><small>${L.cur} / ${L.need} XP</small></div></div>
-      <div class="chips"><span class="chip" title="Günlük seri">🔥 ${S.streak}</span>
-        <button class="chip btn-ghost" data-act="sound" title="Ses">${S.sound ? "🔊" : "🔇"}</button></div>
+    const L = levelInfo(S.xp), pct = Math.round((L.cur / L.need) * 100);
+    return `<header class="hero">
+      <div class="ring" style="--p:${pct}"><span>${L.lvl}</span><small>SEVİYE</small></div>
+      <div class="hero-info">
+        <small class="eyebrow">${L.title}</small>
+        <b class="hello">${greeting()}</b>
+        <div class="bar xp"><span style="width:${pct}%"></span></div>
+        <small>${L.cur} / ${L.need} XP · sonraki seviyeye ${L.need - L.cur} XP</small>
+      </div>
+      <div class="hero-side">
+        <span class="chip streak" title="Günlük seri">🔥 ${S.streak}</span>
+        <button class="chip" data-act="sound" title="Ses aç/kapat">${S.sound ? "🔊" : "🔇"}</button>
+      </div>
     </header>`;
   }
 
@@ -158,31 +168,53 @@
     const dailyDone = S.dailyDone === dayStr();
     $app.innerHTML = `${header()}
       <main class="home">
-        <button class="card daily ${dailyDone ? "done" : ""}" data-act="daily">
-          <div class="big-ico">${dailyDone ? "✅" : "🎁"}</div>
-          <div><h3>Günün Görevi</h3><p>${dailyDone ? "Bugünkü görevi tamamladın! Yine de oynayabilirsin." : "Tüm derslerden 10 karışık soru · <b>+50 bonus XP</b>"}</p></div>
+        <button class="daily ${dailyDone ? "done" : ""}" data-act="daily">
+          <div class="daily-ico">${dailyDone ? "✅" : "🎁"}</div>
+          <div class="daily-txt"><small class="eyebrow">Günün Görevi</small>
+            <h3>${dailyDone ? "Bugünkü görev tamam!" : "10 soruluk karışık tur"}</h3>
+            <p>${dailyDone ? "Serini korudun. Yine de oynayıp XP toplayabilirsin." : "Tüm derslerden seçme sorular · <b>+50 bonus XP</b>"}</p></div>
+          <span class="go">${dailyDone ? "Tekrar" : "Başla"}</span>
         </button>
-        <h2 class="sec">Oyun Salonu</h2>
-        <div class="grid">
-          <button class="card arc duel-card" data-act="arcade" data-mode="duel"><div class="subj-ico">⚔️</div><h3>Düello</h3><small>Rakip bota karşı hız ve bilgi yarışı</small></button>
-          <button class="card arc tower-card" data-act="arcade" data-mode="ladder"><div class="subj-ico">🗼</div><h3>Bilgi Kulesi</h3><small>12 kat, 3 joker. Yanlışta düşersin!</small></button>
-        </div>
-        <h2 class="sec">Dünyalar</h2>
-        <div class="grid">
-          ${SUBJ.map((s) => { const p = subjectProgress(s); return `
-            <button class="card subj" style="--c:${s.color}" data-act="subject" data-id="${s.id}">
-              <div class="subj-ico">${s.icon}</div><h3>${s.name}</h3><small>${s.world}</small>
-              <div class="bar"><span style="width:${(p.got / p.max) * 100}%"></span></div><small>⭐ ${p.got}/${p.max}</small>
-            </button>`; }).join("")}
-        </div>
-        <button class="card review" data-act="review" ${S.mistakes.length ? "" : "disabled"}>
-          <div class="big-ico">📕</div>
-          <div><h3>Hata Defteri <span class="pill">${S.mistakes.length}</span></h3>
-          <p>${S.mistakes.length ? "Yanlış yaptığın sorular burada. Doğru cevapladıkça defterden silinir." : "Henüz hatan yok. Yanlış yaptığın sorular buraya düşer."}</p></div>
+
+        <section class="block">
+          <div class="sec-head"><h2>Dünyalar</h2><small>KPSS GY–GK</small></div>
+          <div class="worlds">
+            ${SUBJ.map((s) => { const p = subjectProgress(s); return `
+              <button class="world" style="--c:${s.color}" data-act="subject" data-id="${s.id}">
+                <div class="world-top"><span class="sticker">${s.icon}</span><span class="tag">${TAG[s.id]}</span></div>
+                <div class="world-body"><h3>${s.name}</h3><small>${s.world} · ${s.units.length} ünite</small>
+                  <div class="bar"><span style="width:${(p.got / p.max) * 100}%"></span></div>
+                  <small class="stars-count">★ ${p.got} / ${p.max}</small></div>
+              </button>`; }).join("")}
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="sec-head"><h2>Oyun Salonu</h2><small>Ders seç, hemen oyna</small></div>
+          <div class="arcade">
+            <button class="arc duel-card" data-act="arcade" data-mode="duel"><span class="sticker">⚔️</span><div><h3>Düello</h3><small>Rakip bota karşı hız ve bilgi</small></div></button>
+            <button class="arc tower-card" data-act="arcade" data-mode="ladder"><span class="sticker">🗼</span><div><h3>Bilgi Kulesi</h3><small>12 kat, 3 joker, 2 baraj</small></div></button>
+          </div>
+        </section>
+
+        <button class="review" data-act="review" ${S.mistakes.length ? "" : "disabled"}>
+          <span class="sticker">📕</span>
+          <div><h3>Hata Defteri</h3>
+          <p>${S.mistakes.length ? "Yanlış yaptığın sorular burada. Doğru cevapladıkça silinir." : "Henüz hatan yok. Yanlış yaptığın sorular buraya düşer."}</p></div>
+          <span class="count">${S.mistakes.length}</span>
         </button>
-        <h2 class="sec">Rozetler</h2>
-        <div class="badges">${BADGES.map((b) => `<div class="badge ${S.badges.includes(b.id) ? "on" : ""}" title="${esc(b.desc)}"><span>${b.icon}</span><small>${b.name}</small></div>`).join("")}</div>
-        <p class="stats">✔ ${S.stats.correct} doğru · ✘ ${S.stats.wrong} yanlış · 🎮 ${S.stats.games} oyun · 🔥 en iyi kombo ${S.stats.bestCombo}</p>
+
+        <section class="block">
+          <div class="sec-head"><h2>Rozetler</h2><small>${S.badges.length} / ${BADGES.length}</small></div>
+          <div class="badges">${BADGES.map((b) => `<div class="badge ${S.badges.includes(b.id) ? "on" : ""}" title="${esc(b.desc)}"><span>${b.icon}</span><small>${b.name}</small></div>`).join("")}</div>
+        </section>
+
+        <div class="stats">
+          <div><b>${S.stats.correct}</b><small>doğru</small></div>
+          <div><b>${S.stats.wrong}</b><small>yanlış</small></div>
+          <div><b>${S.stats.games}</b><small>oyun</small></div>
+          <div><b>${S.stats.bestCombo}</b><small>en iyi kombo</small></div>
+        </div>
         <button class="link" data-act="reset">İlerlemeyi sıfırla</button>
       </main>`;
   }
@@ -194,13 +226,16 @@
   function renderArcade(mode) {
     stopTimers(); G = null;
     const a = ARC[mode];
-    $app.innerHTML = `<header class="top sub"><button class="btn-ghost back" data-act="home">‹</button>
-        <div><h2>${a.icon} ${a.name}</h2><small>Oyun Salonu</small></div><span></span></header>
-      <main class="home"><div class="card"><p>${a.desc}</p></div>
-        <h2 class="sec">Hangi ders?</h2>
-        <div class="grid">
-          <button class="card subj" style="--c:#7c5cff" data-act="arcgo" data-mode="${mode}" data-sid="mix"><div class="subj-ico">🎲</div><h3>Karışık</h3><small>Tüm dersler</small></button>
-          ${SUBJ.map((s) => `<button class="card subj" style="--c:${s.color}" data-act="arcgo" data-mode="${mode}" data-sid="${s.id}"><div class="subj-ico">${s.icon}</div><h3>${s.name}</h3><small>${s.world}</small></button>`).join("")}
+    $app.innerHTML = `<header class="band" style="--c:${mode === "duel" ? "#f63d68" : "#0ba5ec"}">
+        <button class="back" data-act="home" aria-label="Geri">‹</button>
+        <div><small class="eyebrow">Oyun Salonu</small><h2>${a.icon} ${a.name}</h2></div>
+      </header>
+      <main class="home">
+        <div class="note">${a.desc}</div>
+        <div class="sec-head"><h2>Hangi ders?</h2></div>
+        <div class="worlds">
+          <button class="world" style="--c:#6c4cff" data-act="arcgo" data-mode="${mode}" data-sid="mix"><div class="world-top"><span class="sticker">🎲</span><span class="tag">Hepsi</span></div><div class="world-body"><h3>Karışık</h3><small>Tüm dersler</small></div></button>
+          ${SUBJ.map((s) => `<button class="world" style="--c:${s.color}" data-act="arcgo" data-mode="${mode}" data-sid="${s.id}"><div class="world-top"><span class="sticker">${s.icon}</span><span class="tag">${TAG[s.id]}</span></div><div class="world-body"><h3>${s.name}</h3><small>${s.world}</small></div></button>`).join("")}
         </div></main>`;
   }
   function startArcade(mode, sid) {
@@ -210,28 +245,52 @@
 
   function renderSubject(sid) {
     stopTimers(); G = null;
-    const s = SUBJ.find((x) => x.id === sid);
+    const s = SUBJ.find((x) => x.id === sid), p = subjectProgress(s);
     let idx = 0;
-    $app.innerHTML = `<header class="top sub" style="--c:${s.color}">
-        <button class="btn-ghost back" data-act="home">‹</button>
-        <div><h2>${s.icon} ${s.name}</h2><small>${s.world}</small></div><span></span>
+    $app.innerHTML = `<header class="band" style="--c:${s.color}">
+        <button class="back" data-act="home" aria-label="Geri">‹</button>
+        <div class="band-txt"><small class="eyebrow">${TAG[s.id]} · ${s.world}</small><h2>${s.icon} ${s.name}</h2>
+          <div class="bar light"><span style="width:${(p.got / p.max) * 100}%"></span></div></div>
+        <span class="chip">★ ${p.got}/${p.max}</span>
       </header>
       <main class="map" style="--c:${s.color}">
-        ${s.units.map((u) => `
-          <section class="unit"><h3>${esc(u.title)}</h3>
+        ${s.units.map((u, ui) => `
+          <section class="unit">
+            <div class="ribbon"><small>Ünite ${ui + 1}</small><h3>${esc(u.title)}</h3></div>
             <div class="path">
+              <svg class="road" aria-hidden="true"></svg>
               ${nodesFor(u).map((n) => {
                 const st = S.stars[n.key] || 0, open = isUnlocked(s, n.key), side = ["c", "r", "c", "l"][idx++ % 4];
+                const current = open && !st;
                 return `<div class="node-wrap ${side}">
-                  <button class="node ${open ? "" : "locked"} ${n.kind === "boss" ? "boss" : ""} ${st ? "done" : ""}" ${open ? `data-act="play" data-key="${n.key}" data-kind="${n.kind}" data-unit="${u.id}"` : "disabled"}>
+                  <button class="node ${open ? "" : "locked"} ${n.kind === "boss" ? "boss" : ""} ${st ? "done" : ""} ${current ? "current" : ""}" ${open ? `data-act="play" data-key="${n.key}" data-kind="${n.kind}" data-unit="${u.id}"` : "disabled"} aria-label="${n.label}">
                     <span>${open ? n.icon : "🔒"}</span></button>
-                  <div class="node-label">${n.label}<div class="stars">${[1, 2, 3].map((k) => `<i class="${st >= k ? "on" : ""}">★</i>`).join("")}</div></div>
+                  <div class="node-label"><b>${n.label}</b><div class="stars">${[1, 2, 3].map((k) => `<i class="${st >= k ? "on" : ""}">★</i>`).join("")}</div></div>
                 </div>`;
               }).join("")}
             </div>
           </section>`).join("")}
       </main>`;
+    drawRoads();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (document.querySelector(".road")) drawRoads(); });
   }
+
+  // Duraklar arasında kıvrılan yol (SVG)
+  function drawRoads() {
+    document.querySelectorAll(".path").forEach((path) => {
+      const svg = path.querySelector(".road"), box = path.getBoundingClientRect();
+      const pts = [...path.querySelectorAll(".node")].map((n) => { const r = n.getBoundingClientRect(); return [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2]; });
+      if (pts.length < 2) return;
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) {
+        const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], my = (y0 + y1) / 2;
+        d += ` C${x0},${my} ${x1},${my} ${x1},${y1}`;
+      }
+      svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
+      svg.innerHTML = `<path d="${d}" class="road-base"/><path d="${d}" class="road-dash"/>`;
+    });
+  }
+  window.addEventListener("resize", () => { if (document.querySelector(".road")) drawRoads(); });
 
   /* ================= OYUN BAŞLATMA ================= */
   function startGame(kind, opts) {
@@ -564,7 +623,7 @@
     spawnBalloon();
     G.timer = setInterval(spawnBalloon, 1250);
   }
-  const BCOLORS = ["#e74c3c", "#3498db", "#9b59b6", "#e67e22", "#16a085", "#d35400", "#2c82c9", "#c0392b"];
+  const BCOLORS = ["#ff4d6d", "#0ba5ec", "#6c4cff", "#ff8a00", "#12b76a", "#f63d68", "#7a5af8", "#f5a000"];
   function spawnBalloon() {
     if (G.over) return;
     if (G.spawned >= G.queue.length) { clearInterval(G.timer); G.timer = null; return; }
