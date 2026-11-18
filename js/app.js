@@ -467,11 +467,11 @@
       case "home": return renderHome();
       case "subject": sfx.click(); return renderSubject(d.id);
       case "sound": S.sound = !S.sound; save(); return renderHome();
-      case "reset": if (confirm("Tüm ilerlemen silinecek. Emin misin?")) { S = fresh(); save(); renderHome(); } return;
+      case "reset": if (el.dataset.armed) { S = fresh(); save(); renderHome(); } else { el.dataset.armed = "1"; el.textContent = "Tüm ilerleme silinecek — onaylamak için tekrar dokun"; } return;
       case "daily": return startGame("daily", {});
       case "review": return startGame("review", {});
       case "play": { const f = findUnit(d.unit); G = null; return startGame(d.kind, { key: d.key, unit: f.u, sid: f.s.id }); }
-      case "quit": if (confirm("Oyundan çıkılsın mı? Bu turdaki ilerleme kaydedilmez.")) { const sid = G && G.sid; stopTimers(); return sid ? renderSubject(sid) : renderHome(); } return;
+      case "quit": { const sid = G && G.sid; stopTimers(); return sid ? renderSubject(sid) : renderHome(); }
       case "ans": return answerQuiz(+d.k);
       case "next": return nextQuiz();
       case "sp": return answerSpeed(+d.k);
