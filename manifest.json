@@ -1,0 +1,10 @@
+{
+  "name": "KPSS Oyun",
+  "short_name": "KPSS Oyun",
+  "description": "Oynayarak KPSS'ye hazırlan",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1b1640",
+  "theme_color": "#1b1640",
+  "lang": "tr"
+}
