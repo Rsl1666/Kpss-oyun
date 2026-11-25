@@ -197,6 +197,7 @@ function collect(e,o){
   burst(o.x,o.y,o.type==='gold'?'#ffcc33':o.type==='big'?'#c77dff':'#5be37d',6);
 }
 function gainXp(e,xp){e.xp+=xp;while(e.xp>=e.xpNext){e.xp-=e.xpNext;e.level++;e.xpNext=Math.floor(e.xpNext*1.3+6);
+  e.stats.maxHp+=8;e.hp+=8;e.stats.dmg*=1.05; // her seviye kendiliğinden güçlendirir
   if(e.isBot)levelUp(e,true);else{e.pending++;e.hp=Math.min(e.stats.maxHp,e.hp+20);
     if(tierOf(e.level)!==tierOf(e.level-1)){toast(`Evrim: ${TIERS[tierOf(e.level)]}`,'#c77dff');burst(e.x,e.y,'#c77dff',40)}}}}
 
@@ -266,10 +267,10 @@ function findTarget(x,y,range,e,onlyOwn){
   if(!best){for(const o of orbs){const d=(o.x-x)**2+(o.y-y)**2;if(d<bd&&ownerAt(o.x,o.y)===e.id){bd=d;best=o}}}
   return best;
 }
-function fire(x,y,ang,e,dmg,n){
+function fire(x,y,ang,e,dmg,n,tur){
   const sp=0.13;
   for(let k=0;k<n;k++){const a=ang+(k-(n-1)/2)*sp+rnd(-.04,.04);
-    bullets.push({x:x+Math.cos(a)*16,y:y+Math.sin(a)*16,vx:Math.cos(a)*620,vy:Math.sin(a)*620,owner:e,dmg,life:e.stats.range/620+.12})}
+    bullets.push({x:x+Math.cos(a)*16,y:y+Math.sin(a)*16,vx:Math.cos(a)*620,vy:Math.sin(a)*620,owner:e,dmg,tur,life:e.stats.range/620+.12})}
 }
 
 /* ---------- efektler ---------- */
@@ -278,13 +279,13 @@ function floatText(x,y,s,c){texts.push({x,y,s,c,life:1})}
 let toastT=0;function toast(s,c){const t=$('toast');t.textContent=s;t.style.color=c||'#fff';t.style.opacity=1;toastT=1.8}
 
 /* ---------- ölüm ---------- */
-function kill(v,killer){
+function kill(v,killer,byTurret){
   v.alive=false;v.hp=0;burst(v.x,v.y,v.color,30);
   for(let i=0;i<Math.min(14,4+v.level);i++){const o=spawnOrb(v.x+rnd(-60,60),v.y+rnd(-60,60),i<2?'big':Math.random()<.5?'gold':'xp')}
   turrets=turrets.filter(t=>t.owner!==v);clearTerritory(v.id);
   if(killer&&killer.alive!==undefined){killer.kills++;gainXp(killer,10+v.level*4);killer.gold+=5+v.level;
     if(killer===player)toast(`${v.name} vuruldu!`,'#5be37d')}
-  if(v===player){paused=true;$('lvup').hidden=true;lvChoices=[];$('deadT').textContent=killer?`${killer.name} seni vurdu`:'Vuruldun';
+  if(v===player){paused=true;$('lvup').hidden=true;lvChoices=[];$('deadT').textContent=killer?`${killer.name} (Sv ${killer.level})${byTurret?' taretiyle':''} seni vurdu`:'Vuruldun';
     $('deadS').textContent=`Seviye ${v.level} · ${v.kills} leş · en geniş alan %${v.best.toFixed(1)}`;$('dead').hidden=false}
   else{v.respawn=3+Math.random()*2;v.keep=Math.max(1,Math.floor(v.level*.5))}
 }
@@ -293,6 +294,7 @@ function kill(v,killer){
 function botThink(e,dt){
   const ai=e.ai;ai.t-=dt;
   if(e.hp<e.stats.maxHp*.35&&ai.mode!=='flee'){ai.mode='flee';ai.t=0}
+  if(ai.mode!=='flee'&&Math.random()<dt*2)for(const o of ents){if(o!==e&&o.alive&&o.level>=e.level+3&&(o.x-e.x)**2+(o.y-e.y)**2<320*320){ai.mode='flee';ai.t=0;break}}
   if(ai.t<=0){
     ai.t=rnd(1.2,3);
     if(ai.mode==='flee'&&e.hp>e.stats.maxHp*.75)ai.mode='wander';
@@ -361,7 +363,7 @@ function update(dt){
 
   for(const e of ents){
     if(!e.alive){if(e.isBot){e.respawn-=dt;if(e.respawn<=0){resetEnt(e,e.keep||1);spawn(e)}}continue}
-    e.r=15+Math.min(9,(e.level-1)*.45);
+    e.r=15+Math.min(9,(e.level-1)*.45);e.hr=15+Math.min(4,(e.level-1)*.2); // isabet alanı görüntü kadar büyümez
     const dir=e.isBot?botThink(e,dt):playerDir();
     const onOwn=ownerAt(e.x,e.y)===e.id, sp=e.stats.speed*(onOwn?1.08:1);
     e.x=clamp(e.x+dir.x*sp*dt,e.r,WW-e.r);e.y=clamp(e.y+dir.y*sp*dt,e.r,WH-e.r);
@@ -381,14 +383,14 @@ function update(dt){
   for(let i=turrets.length-1;i>=0;i--){const t=turrets[i];
     if(ownerAt(t.x,t.y)!==t.owner.id||t.hp<=0){burst(t.x,t.y,t.owner.color,16);turrets.splice(i,1);continue}
     t.cd-=dt;const tg=findTarget(t.x,t.y,170,t.owner,false);
-    if(tg){t.angle=Math.atan2(tg.y-t.y,tg.x-t.x);if(t.cd<=0){t.cd=1/3.2;fire(t.x,t.y,t.angle,t.owner,t.owner.stats.dmg*.6,1)}}
+    if(tg){t.angle=Math.atan2(tg.y-t.y,tg.x-t.x);if(t.cd<=0){t.cd=1/3.2;fire(t.x,t.y,t.angle,t.owner,t.owner.stats.dmg*.6,1,true)}}
     else t.angle+=dt*.8;
   }
   // mermiler
   for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;let hit=false;
     if(b.life<=0||b.x<0||b.y<0||b.x>WW||b.y>WH)hit=true;
-    if(!hit)for(const e of ents){if(e===b.owner||!e.alive)continue;if((e.x-b.x)**2+(e.y-b.y)**2<e.r*e.r){
-      e.hp-=b.dmg;e.hitFlash=.12;hit=true;burst(b.x,b.y,e.color,3);if(e.hp<=0)kill(e,b.owner);break}}
+    if(!hit)for(const e of ents){if(e===b.owner||!e.alive)continue;if((e.x-b.x)**2+(e.y-b.y)**2<e.hr*e.hr){
+      e.hp-=b.dmg*clamp(1+(b.owner.level-e.level)*.08,.4,1.8); /* seviye farkı hasarı etkiler */e.hitFlash=.12;hit=true;burst(b.x,b.y,e.color,3);if(e.hp<=0)kill(e,b.owner,b.tur);break}}
     if(!hit)for(const t of turrets){if(t.owner===b.owner)continue;if((t.x-b.x)**2+(t.y-b.y)**2<196){t.hp-=b.dmg;hit=true;burst(b.x,b.y,'#aaa',3);break}}
     if(!hit)for(let j=orbs.length-1;j>=0;j--){const o=orbs[j];if((o.x-b.x)**2+(o.y-b.y)**2<(o.r+3)**2){
       o.hp-=b.dmg;hit=true;if(o.hp<=0){collect(b.owner,o);orbs[j]=orbs[orbs.length-1];orbs.pop()}break}}
@@ -448,7 +450,8 @@ function draw(time){
     ctx.restore();
     drawBody(e,time);const top=e.r+(tierOf(e.level)>=2?10:0)+(tierOf(e.level)>=4?6:0);
     ctx.fillStyle='#0d1117';ctx.font='700 11px "Chakra Petch",sans-serif';ctx.fillText(e.level,e.x,e.y+4);
-    ctx.fillStyle='#e8eef7';ctx.font='500 12px Rubik,sans-serif';ctx.fillText(e.name,e.x,e.y-top-12);
+    const lg=e.level-player.level;ctx.fillStyle=e===player?'#e8eef7':lg>=3?'#ff5a5a':lg>=1?'#ffa94d':lg<=-3?'#5be37d':'#e8eef7';
+    ctx.font='500 12px Rubik,sans-serif';ctx.fillText(e.name,e.x,e.y-top-12);
     ctx.fillStyle='#000a';ctx.fillRect(e.x-18,e.y-top-8,36,4);ctx.fillStyle=e.hp/e.stats.maxHp>.35?'#5be37d':'#ff5a5a';ctx.fillRect(e.x-18,e.y-top-8,36*e.hp/e.stats.maxHp,4)}
   for(const p of parts){ctx.globalAlpha=Math.max(0,p.life*2);ctx.fillStyle=p.c;ctx.fillRect(p.x-2,p.y-2,4,4)}ctx.globalAlpha=1;
   ctx.font='700 13px "Chakra Petch",sans-serif';
