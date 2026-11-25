@@ -41,7 +41,11 @@ canvas#c{position:fixed;inset:0;display:block;width:100%;height:100%}
   font:700 14px var(--display);letter-spacing:.06em;color:#1a1300;background:var(--accent);border:0;border-radius:10px;
   padding:12px 16px;cursor:pointer;box-shadow:0 3px 0 #a07c10}
 #turretBtn:disabled{background:#3a4150;color:var(--muted);box-shadow:none;cursor:default}
-#turretBtn:focus-visible,.btn:focus-visible,.card:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#dashBtn{position:fixed;right:calc(max(12px,env(safe-area-inset-right,0px)) + 162px);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:3;
+  width:70px;height:70px;border-radius:50%;border:0;font:700 15px var(--display);letter-spacing:.06em;color:#06121f;cursor:pointer;
+  background:conic-gradient(#4fb3ff var(--p,100%),#2a3546 0);box-shadow:0 3px 0 #1d5f8f}
+#dashBtn:disabled{color:var(--fg);box-shadow:none;cursor:default}
+#dashBtn:focus-visible,#turretBtn:focus-visible,.btn:focus-visible,.card:focus-visible{outline:2px solid #fff;outline-offset:2px}
 #toast{top:calc(70px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);font:700 16px var(--display);
   letter-spacing:.05em;text-shadow:0 2px 6px #000;opacity:0;transition:opacity .3s}
 .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
@@ -59,6 +63,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 #game.narrow #lvup{width:calc(100% - 32px);bottom:calc(184px + env(safe-area-inset-bottom,0px))}#game.narrow .card .d{font-size:10.5px}#game.narrow #board{width:140px}#game.narrow #stats{width:170px}#game.narrow #mini{width:110px;height:110px}
 #game.narrow #turretBtn{bottom:calc(134px + env(safe-area-inset-bottom,0px));font-size:12px;padding:10px 12px}#game.narrow #joy{width:124px;height:124px}
+#game.narrow #dashBtn{right:calc(max(12px,env(safe-area-inset-right,0px)) + 122px);width:60px;height:60px}
 .card{background:#0b1119;border:1px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;color:var(--fg);font:inherit;text-align:center}
 .card:hover{border-color:var(--accent)}
 .card .ic{font:700 18px var(--display);color:var(--accent)}
@@ -66,7 +71,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 .card .d{font-size:12px;color:var(--muted)}
 .kbd{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:12px;color:var(--fg)}
 #lvup{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:4;
-  width:min(520px,calc(100% - 340px));box-sizing:border-box;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:8px;animation:pop .25s ease-out}
+  width:min(520px,calc(100% - 440px));box-sizing:border-box;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:8px;animation:pop .25s ease-out}
 .lvhead{font:700 12px var(--display);letter-spacing:.08em;color:var(--accent);text-align:center;margin-bottom:6px}
 .lvhead span{color:var(--muted)}
 #tier{color:#c77dff;font-size:12px;letter-spacing:.1em;margin-left:4px}
@@ -75,9 +80,10 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
   #game.compact #stats{width:150px;padding:6px 10px}#game.compact #stats .lv{font-size:15px}#game.compact .bar{height:6px;margin:3px 0 1px}#game.compact .row{font-size:11px}
   #game.compact #board{width:150px;padding:6px 10px;font-size:11px}#game.compact #board ol{gap:1px}#game.compact #board h3{margin-bottom:3px}
   #game.compact #mini{width:96px;height:96px}
+  #game.compact #dashBtn{right:calc(max(12px,env(safe-area-inset-right,0px)) + 108px);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:62px;height:62px;font-size:13px}
   #game.compact #turretBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px));font-size:12px;padding:9px 12px}
   #game.compact #joy{width:116px;height:116px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-  #game.compact #lvup{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 300px));padding:6px}
+  #game.compact #lvup{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 400px));padding:6px}
   #game.compact .card{padding:5px 4px}#game.compact .card .d{display:none}#game.compact .lvhead{margin-bottom:4px}
   #game.compact .overlay{align-items:flex-start;overflow-y:auto}#game.compact .box{padding:14px}#game.compact .box ul{font-size:12px;line-height:1.4;margin:4px 0 8px}
 #game{position:fixed;inset:0;overflow:hidden}
@@ -107,6 +113,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 <div class="hud" id="board"><h3>Alan Sıralaması</h3><ol id="boardList"></ol></div>
 <canvas class="hud" id="mini" width="120" height="120"></canvas>
 <button id="turretBtn" type="button">TARET KUR · 15</button>
+<button id="dashBtn" type="button" aria-label="Kaç: kısa süre iki kat hız">KAÇ</button>
 <div id="joy" aria-label="Yön joystick'i"><div id="knob"></div></div>
 <div class="hud" id="toast"></div>
 
@@ -116,6 +123,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
     <p>Gezdiğin her kare senin olur, bir yeri çevrelersen içi de senin olur. Alanına düşen her şeyi makinalı tüfeğin kendiliğinden toplar.</p>
     <ul>
       <li><b>Çevrele:</b> izinle bir halka çiz, ortası (rakip alanı dahil) bir anda senin olur.</li>
+      <li><b>Kaç:</b> <span class="kbd">Shift</span> ya da KAÇ düğmesi, kısa süre iki kat hız. Kendi alanında %30 daha az hasar alırsın.</li>
       <li><b>Hareket:</b> sol alttaki joystick, fare ya da <span class="kbd">WASD</span></li>
       <li><b>Taret:</b> <span class="kbd">Boşluk</span> ya da sağdaki düğme. Kendi alanında kurulur, alanını savunur ve toplar.</li>
       <li><b>Güçlen:</b> yeşil küre deneyim, sarı altın, mor küre ikisinden de çok verir.</li>
@@ -180,7 +188,7 @@ addEventListener('resize',resize); resize();
 function baseStats(){return {fire:4,range:190,dmg:10,speed:165,paint:2,maxHp:100,barrels:1,turretMax:1}}
 function makeEnt(id,name,isBot){
   const e={id,name,isBot,color:COLORS[id],x:0,y:0,r:15,angle:0,stats:baseStats(),hp:100,level:1,xp:0,xpNext:10,
-    gold:0,cd:0,alive:true,respawn:0,kills:0,best:0,pending:0,ai:{tx:0,ty:0,t:0,mode:'wander'},hitFlash:0};
+    gold:0,cd:0,alive:true,respawn:0,kills:0,best:0,pending:0,ai:{tx:0,ty:0,t:0,mode:'wander'},hitFlash:0,dashT:0,dashCd:0};
   return e;
 }
 function spawn(e){
@@ -244,6 +252,7 @@ function poly(x,y,r,n,rot){ctx.beginPath();for(let k=0;k<n;k++){const a=rot+k*6.
 function star(x,y,r,n,rot){ctx.beginPath();for(let k=0;k<n*2;k++){const a=rot+k*Math.PI/n,rr=k%2?r*.58:r;ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr)}ctx.closePath()}
 function drawBody(e,time){
   const t=tierOf(e.level),x=e.x,y=e.y,r=e.r,spin=time*.0012;
+  if(e.dashT>0){const a=e.moveAng||0;ctx.fillStyle=e.color;for(let k=1;k<=3;k++){ctx.globalAlpha=.25/k;ctx.beginPath();ctx.arc(x-Math.cos(a)*r*k*.9,y-Math.sin(a)*r*k*.9,r,0,6.283);ctx.fill()}ctx.globalAlpha=1}
   if(t>=3){ctx.globalAlpha=.22+Math.sin(time*.005)*.08;ctx.fillStyle=e.color;ctx.beginPath();ctx.arc(x,y,r+12+(t-3)*6,0,6.283);ctx.fill();ctx.globalAlpha=1}
   if(t>=2){ctx.fillStyle='#c9d3e0';const n=t>=4?10:t>=3?8:6;
     for(let k=0;k<n;k++){const a=spin*(t>=4?2:1)+k*6.283/n;ctx.beginPath();
@@ -263,9 +272,9 @@ function drawBody(e,time){
 /* ---------- güçlendirmeler ---------- */
 const UPG=[
   {k:'fire',ic:'»',n:'Makinalı Hız',d:'Atış hızı +22%',ok:e=>e.stats.fire<16,f:e=>e.stats.fire*=1.22},
-  {k:'range',ic:'◎',n:'Dürbün',d:'Menzil +14%',ok:e=>e.stats.range<420,f:e=>e.stats.range*=1.14},
+  {k:'range',ic:'◎',n:'Dürbün',d:'Menzil +14%',ok:e=>e.stats.range<330,f:e=>e.stats.range*=1.14},
   {k:'dmg',ic:'✦',n:'Kalın Kalibre',d:'Hasar +28%',ok:()=>true,f:e=>e.stats.dmg*=1.28},
-  {k:'speed',ic:'➤',n:'Çevik Adım',d:'Hareket hızı +10%',ok:e=>e.stats.speed<290,f:e=>e.stats.speed*=1.1},
+  {k:'speed',ic:'➤',n:'Çevik Adım',d:'Hareket hızı +8%',ok:e=>e.stats.speed<230,f:e=>e.stats.speed*=1.08},
   {k:'paint',ic:'▦',n:'Geniş İz',d:'Bıraktığın iz +1 kare',ok:e=>e.stats.paint<6,f:e=>e.stats.paint++},
   {k:'hp',ic:'▣',n:'Zırh',d:'Maks can +30, tam iyileşme',ok:()=>true,f:e=>{e.stats.maxHp+=30;e.hp=e.stats.maxHp}},
   {k:'barrels',ic:'≡',n:'Ekstra Namlu',d:'Aynı anda +1 mermi',ok:e=>e.stats.barrels<5,f:e=>e.stats.barrels++},
@@ -329,7 +338,7 @@ function kill(v,killer,byTurret){
 /* ---------- bot zekası ---------- */
 function botThink(e,dt){
   const ai=e.ai;ai.t-=dt;
-  if(e.hp<e.stats.maxHp*.35&&ai.mode!=='flee'){ai.mode='flee';ai.t=0}
+  if(e.hp<e.stats.maxHp*.35&&ai.mode!=='flee'){ai.mode='flee';ai.t=0;dash(e)}
   if(ai.mode!=='flee'&&Math.random()<dt*2)for(const o of ents){if(o!==e&&o.alive&&o.level>=e.level+3&&(o.x-e.x)**2+(o.y-e.y)**2<320*320){ai.mode='flee';ai.t=0;break}}
   if(ai.t<=0){
     ai.t=rnd(1.2,3);
@@ -341,7 +350,7 @@ function botThink(e,dt){
       let prey=null,pd=420*420;
       for(const o of ents){if(o===e||!o.alive)continue;const d=(o.x-e.x)**2+(o.y-e.y)**2;
         if(d<pd&&(o.level<=e.level+1)&&o.hp<e.hp*1.3){pd=d;prey=o}}
-      if(prey&&Math.random()<.55){ai.mode='hunt';ai.prey=prey}
+      if(prey&&Math.random()<(ownerAt(prey.x,prey.y)===prey.id?.25:.55)){ai.mode='hunt';ai.prey=prey}
       else{ai.mode='wander';let b=null,bs=-1;
         for(let k=0;k<14;k++){const a=Math.random()*6.28,dist=rnd(150,520);const x=clamp(e.x+Math.cos(a)*dist,40,WW-40),y=clamp(e.y+Math.sin(a)*dist,40,WH-40);
           const ow=ownerAt(x,y);let s=ow===0?3:ow!==e.id?2:0;
@@ -364,6 +373,7 @@ const keys={};let ptr={x:0,y:0,active:false};
 addEventListener('keydown',ev=>{if(ev.target.tagName==='INPUT'){if(ev.key==='Enter')startGame();return}
   keys[ev.key.toLowerCase()]=true;
   if(ev.code==='Space'){ev.preventDefault();if(!paused)placeTurret(player)}
+  if((ev.key==='Shift'||ev.key.toLowerCase()==='e')&&!paused)dash(player);
   if(!$('lvup').hidden&&'123'.includes(ev.key))chooseUpg(+ev.key-1)});
 addEventListener('keyup',ev=>{keys[ev.key.toLowerCase()]=false});
 cv.addEventListener('pointermove',ev=>{ptr.x=ev.clientX;ptr.y=ev.clientY;if(ev.pointerType==='mouse')ptr.active=true});
@@ -381,6 +391,8 @@ joy.addEventListener('pointerup',joyEnd);joy.addEventListener('pointercancel',jo
 cv.addEventListener('pointerup',ev=>{if(ev.pointerType!=='mouse')ptr.active=false});
 cv.addEventListener('pointercancel',()=>{ptr.active=false});
 $('turretBtn').addEventListener('click',()=>{if(!paused)placeTurret(player)});
+$('dashBtn').addEventListener('pointerdown',ev=>{ev.preventDefault();if(!paused)dash(player)});
+function dash(e){if(!e.alive||e.dashCd>0)return;e.dashT=.9;e.dashCd=6;burst(e.x,e.y,'#ffffff',12)}
 $('play').onclick=startGame;
 $('rotBtn').onclick=()=>{forceVert=!forceVert;try{localStorage.setItem('aa_vert',forceVert?'1':'0')}catch(e){}resize();$('rotBtn').blur()};
 $('again').onclick=()=>{$('dead').hidden=true;resetEnt(player,1);spawn(player);paused=false};
@@ -403,12 +415,12 @@ function update(dt){
     if(!e.alive){if(e.isBot){e.respawn-=dt;if(e.respawn<=0){resetEnt(e,e.keep||1);spawn(e)}}continue}
     e.r=15+Math.min(9,(e.level-1)*.45);e.hr=15+Math.min(4,(e.level-1)*.2); // isabet alanı görüntü kadar büyümez
     const dir=e.isBot?botThink(e,dt):playerDir();
-    const onOwn=ownerAt(e.x,e.y)===e.id, sp=e.stats.speed*(onOwn?1.08:1)*Math.max(.68,1-(e.level-1)*.02); // büyüdükçe yavaşlar
+    const onOwn=ownerAt(e.x,e.y)===e.id, sp=e.stats.speed*(onOwn?1.08:1)*Math.max(.55,1-(e.level-1)*.03)*(e.dashT>0?2:1); // büyüdükçe yavaşlar
     e.x=clamp(e.x+dir.x*sp*dt,e.r,WW-e.r);e.y=clamp(e.y+dir.y*sp*dt,e.r,WH-e.r);
     if(dir.x||dir.y)e.moveAng=Math.atan2(dir.y,dir.x);
     paintCircle(e.x,e.y,e.stats.paint,e.id,false);
     if(onOwn)e.hp=Math.min(e.stats.maxHp,e.hp+5*dt);
-    e.hitFlash=Math.max(0,e.hitFlash-dt);
+    e.hitFlash=Math.max(0,e.hitFlash-dt);e.dashT=Math.max(0,e.dashT-dt);e.dashCd=Math.max(0,e.dashCd-dt);
     // makinalı tüfek: alanındaki küreleri ve yakın rakipleri otomatik vurur
     e.cd-=dt;const t=findTarget(e.x,e.y,e.stats.range,e,false);
     if(t){e.angle=Math.atan2(t.y-e.y,t.x-e.x);if(e.cd<=0){e.cd=1/e.stats.fire;fire(e.x,e.y,e.angle,e,e.stats.dmg,e.stats.barrels)}}
@@ -419,7 +431,7 @@ function update(dt){
   }
   fillT-=dt;if(fillT<=0){fillT=.2;for(const e of ents){if(!e.alive||!dirty[e.id])continue;dirty[e.id]=0;
     const n=fillEnclosed(e.id);if(n>0){gainXp(e,Math.ceil(n/6));burst(e.x,e.y,e.color,Math.min(40,10+n/4));
-      if(e===player)toast(`+${n} kare çevreledin!`,'#ffcc33')}}}
+      if(e===player&&n>=10)toast(`+${n} kare çevreledin!`,'#ffcc33')}}}
   // taretler
   for(let i=turrets.length-1;i>=0;i--){const t=turrets[i];
     if(ownerAt(t.x,t.y)!==t.owner.id||t.hp<=0){burst(t.x,t.y,t.owner.color,16);turrets.splice(i,1);continue}
@@ -431,7 +443,7 @@ function update(dt){
   for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;let hit=false;
     if(b.life<=0||b.x<0||b.y<0||b.x>WW||b.y>WH)hit=true;
     if(!hit)for(const e of ents){if(e===b.owner||!e.alive)continue;if((e.x-b.x)**2+(e.y-b.y)**2<e.hr*e.hr){
-      e.hp-=b.dmg*clamp(1+(b.owner.level-e.level)*.08,.4,1.8); /* seviye farkı hasarı etkiler */e.hitFlash=.12;hit=true;burst(b.x,b.y,e.color,3);if(e.hp<=0)kill(e,b.owner,b.tur);break}}
+      e.hp-=b.dmg*clamp(1+(b.owner.level-e.level)*.08,.4,1.8)*(ownerAt(e.x,e.y)===e.id?.7:1); /* seviye farkı hasarı etkiler */e.hitFlash=.12;hit=true;burst(b.x,b.y,e.color,3);if(e.hp<=0)kill(e,b.owner,b.tur);break}}
     if(!hit)for(const t of turrets){if(t.owner===b.owner)continue;if((t.x-b.x)**2+(t.y-b.y)**2<196){t.hp-=b.dmg;hit=true;burst(b.x,b.y,'#aaa',3);break}}
     if(!hit)for(let j=orbs.length-1;j>=0;j--){const o=orbs[j];if((o.x-b.x)**2+(o.y-b.y)**2<(o.r+3)**2){
       o.hp-=b.dmg;hit=true;if(o.hp<=0){collect(b.owner,o);orbs[j]=orbs[orbs.length-1];orbs.pop()}break}}
@@ -506,6 +518,7 @@ function hud(){
   $('xpBar').style.width=(100*p.xp/p.xpNext)+'%';$('xpT').textContent=`${p.xp}/${p.xpNext}`;
   $('gold').textContent=p.gold;$('area').textContent=(counts[p.id]/(GW*GH)*100).toFixed(1)+'%';
   $('tur').textContent=`${myTurrets(p)}/${p.stats.turretMax}`;$('kills').textContent=p.kills;
+  const db=$('dashBtn');db.disabled=!p.alive||p.dashCd>0;db.style.setProperty('--p',((1-p.dashCd/6)*100)+'%');db.textContent=p.dashCd>0?Math.ceil(p.dashCd):'KAÇ';
   const tb=$('turretBtn');tb.disabled=!(p.alive&&p.gold>=TURRET_COST&&myTurrets(p)<p.stats.turretMax);
   const list=ents.slice().sort((a,b)=>counts[b.id]-counts[a.id]);
   $('boardList').innerHTML=list.map((e,i)=>`<li class="${e===p?'me':''}"><span class="dot" style="background:${e.color}"></span><span class="nm">${i+1}. ${esc(e.name)}${e.alive?'':' ✕'}</span><span>${(counts[e.id]/(GW*GH)*100).toFixed(1)}%</span></li>`).join('');
