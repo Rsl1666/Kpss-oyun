@@ -57,8 +57,8 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 .btn{font:700 16px var(--display);letter-spacing:.06em;background:var(--accent);color:#1a1300;border:0;border-radius:10px;
   padding:12px 22px;cursor:pointer;box-shadow:0 3px 0 #a07c10}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-@media (max-width:520px){#lvup{width:calc(100% - 32px);bottom:calc(184px + env(safe-area-inset-bottom,0px))}.card .d{font-size:10.5px}#board{width:140px}#stats{width:170px}#mini{width:110px;height:110px}
-  #turretBtn{bottom:calc(134px + env(safe-area-inset-bottom,0px));font-size:12px;padding:10px 12px}#joy{width:124px;height:124px}}
+#game.narrow #lvup{width:calc(100% - 32px);bottom:calc(184px + env(safe-area-inset-bottom,0px))}#game.narrow .card .d{font-size:10.5px}#game.narrow #board{width:140px}#game.narrow #stats{width:170px}#game.narrow #mini{width:110px;height:110px}
+#game.narrow #turretBtn{bottom:calc(134px + env(safe-area-inset-bottom,0px));font-size:12px;padding:10px 12px}#game.narrow #joy{width:124px;height:124px}
 .card{background:#0b1119;border:1px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;color:var(--fg);font:inherit;text-align:center}
 .card:hover{border-color:var(--accent)}
 .card .ic{font:700 18px var(--display);color:var(--accent)}
@@ -71,26 +71,27 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 .lvhead span{color:var(--muted)}
 #tier{color:#c77dff;font-size:12px;letter-spacing:.1em;margin-left:4px}
 @keyframes pop{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
-/* yatay telefon: kısa ekranda HUD'u sıkıştır */
-@media (max-height:520px) and (orientation:landscape){
-  #stats{width:150px;padding:6px 10px}#stats .lv{font-size:15px}.bar{height:6px;margin:3px 0 1px}.row{font-size:11px}
-  #board{width:150px;padding:6px 10px;font-size:11px}#board ol{gap:1px}#board h3{margin-bottom:3px}
-  #mini{width:96px;height:96px}
-  #turretBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px));font-size:12px;padding:9px 12px}
-  #joy{width:116px;height:116px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-  #lvup{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 300px));padding:6px}
-  .card{padding:5px 4px}.card .d{display:none}.lvhead{margin-bottom:4px}
-  .overlay{align-items:flex-start;overflow-y:auto}.box{padding:14px}.box ul{font-size:12px;line-height:1.4;margin:4px 0 8px}
-}
-#rotate{display:none;z-index:6;flex-direction:column}
-@media (orientation:portrait) and (pointer:coarse){#rotate:not(.skip){display:flex}}
-.phone{width:46px;height:80px;border:3px solid var(--accent);border-radius:9px;margin:0 auto 14px;animation:turn 2s ease-in-out infinite}
-@keyframes turn{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(-90deg)}}
-.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;border:1px solid var(--line);font-size:13px;margin-top:10px}
-@media (prefers-reduced-motion:reduce){#toast{transition:none}#lvup{animation:none}.phone{animation:none;transform:rotate(-90deg)}}
+/* yatay ekran (kısa yükseklik): HUD'u sıkıştır */
+  #game.compact #stats{width:150px;padding:6px 10px}#game.compact #stats .lv{font-size:15px}#game.compact .bar{height:6px;margin:3px 0 1px}#game.compact .row{font-size:11px}
+  #game.compact #board{width:150px;padding:6px 10px;font-size:11px}#game.compact #board ol{gap:1px}#game.compact #board h3{margin-bottom:3px}
+  #game.compact #mini{width:96px;height:96px}
+  #game.compact #turretBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px));font-size:12px;padding:9px 12px}
+  #game.compact #joy{width:116px;height:116px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  #game.compact #lvup{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 300px));padding:6px}
+  #game.compact .card{padding:5px 4px}#game.compact .card .d{display:none}#game.compact .lvhead{margin-bottom:4px}
+  #game.compact .overlay{align-items:flex-start;overflow-y:auto}#game.compact .box{padding:14px}#game.compact .box ul{font-size:12px;line-height:1.4;margin:4px 0 8px}
+#game{position:fixed;inset:0;overflow:hidden}
+#game.rot{inset:auto;top:0;left:0;transform-origin:0 0}
+#rotBtn{display:none;position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:7;
+  width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-size:20px;line-height:1;cursor:pointer}
+#game.touch #rotBtn{display:block}
+#game.narrow #rotBtn{left:auto;right:max(12px,env(safe-area-inset-right,0px));transform:none;top:calc(206px + env(safe-area-inset-top,0px))}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}#lvup{animation:none}}
 </style>
 
+<div id="game">
 <canvas id="c"></canvas>
+<button id="rotBtn" type="button" aria-label="Ekran yönünü değiştir" title="Yatay / dikey">⟲</button>
 
 <div class="hud" id="stats">
   <div class="lv">SEVİYE <span id="lv">1</span><span id="tier"></span></div>
@@ -109,14 +110,6 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 <div id="joy" aria-label="Yön joystick'i"><div id="knob"></div></div>
 <div class="hud" id="toast"></div>
 
-<div class="overlay" id="rotate">
-  <div class="box">
-    <div class="phone"></div>
-    <h2>Telefonu yan çevir</h2>
-    <p>Alan Avcısı yatay ekranda daha rahat oynanır: sol başparmak joystick, sağ başparmak taret.</p>
-    <button class="btn ghost" id="rotSkip" type="button">Dikey devam et</button>
-  </div>
-</div>
 <div class="overlay" id="start">
   <div class="box">
     <h1>ALAN AVCISI</h1>
@@ -125,6 +118,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
       <li><b>Hareket:</b> sol alttaki joystick, fare ya da <span class="kbd">WASD</span></li>
       <li><b>Taret:</b> <span class="kbd">Boşluk</span> ya da sağdaki düğme. Kendi alanında kurulur, alanını savunur ve toplar.</li>
       <li><b>Güçlen:</b> yeşil küre deneyim, sarı altın, mor küre ikisinden de çok verir.</li>
+      <li><b>Ekran:</b> telefonu yan tut, oyun kendiliğinden yatay olur. Dikey oynamak için üstteki ⟲ düğmesi.</li>
       <li><b>Rakipler</b> de aynısını yapıyor. Onları vur, alanları boşa düşsün.</li>
     </ul>
     <input id="nick" maxlength="14" placeholder="Takma adın" autocomplete="off">
@@ -145,6 +139,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
   </div>
 </div>
 
+</div>
 <script>
 (()=>{
 const CELL=20, GW=120, GH=120, WW=GW*CELL, WH=GH*CELL;
@@ -168,7 +163,15 @@ const rnd=(a,b)=>a+Math.random()*(b-a), clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const cellAt=(x,y)=>{const cx=x/CELL|0, cy=y/CELL|0; return (cx<0||cy<0||cx>=GW||cy>=GH)?-1:cy*GW+cx};
 const ownerAt=(x,y)=>{const i=cellAt(x,y);return i<0?0:owner[i]};
 
-function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;
+const coarse=matchMedia('(pointer:coarse)');let rotated=false,forceVert=false;
+try{forceVert=localStorage.getItem('aa_vert')==='1'}catch(e){}
+// dikey telefonda oyunu 90° çevirerek yatay göster (uygulama ekranı döndürmese bile)
+function applyLayout(){const pw=innerWidth,ph=innerHeight,g=$('game');rotated=coarse.matches&&ph>pw&&!forceVert;
+  g.classList.toggle('touch',coarse.matches);g.classList.toggle('rot',rotated);
+  if(rotated){g.style.width=ph+'px';g.style.height=pw+'px';g.style.transform=`translateX(${pw}px) rotate(90deg)`}
+  else{g.style.width='';g.style.height='';g.style.transform=''}
+  const lw=rotated?ph:pw,lh=rotated?pw:ph;g.classList.toggle('narrow',lw<=520);g.classList.toggle('compact',lh<=520&&lw>lh);return [lw,lh]}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);[W,H]=applyLayout();cv.width=W*DPR;cv.height=H*DPR;
   scale=clamp(Math.min(W,H)/560,.8,1.1)}
 addEventListener('resize',resize); resize();
 
@@ -359,6 +362,7 @@ cv.addEventListener('pointerdown',ev=>{if(ev.pointerType!=='mouse')return;ptr.x=
 // sanal joystick
 const joy=$('joy'),knob=$('knob'),jv={x:0,y:0,id:null};
 function joyMove(ev){const r=joy.getBoundingClientRect(),R=r.width/2,m=R*.7;let dx=ev.clientX-r.left-R,dy=ev.clientY-r.top-R;
+  if(rotated){const t=dx;dx=dy;dy=-t}
   const l=Math.hypot(dx,dy);if(l>m){dx*=m/l;dy*=m/l}knob.style.transform=`translate(${dx}px,${dy}px)`;
   const k=Math.hypot(dx,dy)/m;jv.x=k<.12?0:dx/m;jv.y=k<.12?0:dy/m}
 joy.addEventListener('pointerdown',ev=>{ev.preventDefault();jv.id=ev.pointerId;try{joy.setPointerCapture(ev.pointerId)}catch(e){}joyMove(ev)});
@@ -369,9 +373,7 @@ cv.addEventListener('pointerup',ev=>{if(ev.pointerType!=='mouse')ptr.active=fals
 cv.addEventListener('pointercancel',()=>{ptr.active=false});
 $('turretBtn').addEventListener('click',()=>{if(!paused)placeTurret(player)});
 $('play').onclick=startGame;
-const rotMQ=matchMedia('(orientation:portrait) and (pointer:coarse)');
-$('rotSkip').onclick=()=>$('rotate').classList.add('skip');
-const rotBlocking=()=>rotMQ.matches&&!$('rotate').classList.contains('skip');
+$('rotBtn').onclick=()=>{forceVert=!forceVert;try{localStorage.setItem('aa_vert',forceVert?'1':'0')}catch(e){}resize();$('rotBtn').blur()};
 $('again').onclick=()=>{$('dead').hidden=true;resetEnt(player,1);spawn(player);paused=false};
 
 function playerDir(){
@@ -507,7 +509,7 @@ function drawMini(){
 let last=performance.now();
 function loop(t){
   const dt=Math.min(.05,(t-last)/1000);last=t;
-  if(started&&!paused&&!rotBlocking())update(dt);
+  if(started&&!paused)update(dt);
   if(started){draw(t);if(frame++%8===0){hud();drawMini()}}
   if(toastT>0){toastT-=dt;if(toastT<=0)$('toast').style.opacity=0}
   requestAnimationFrame(loop);
