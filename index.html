@@ -71,7 +71,23 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 .lvhead span{color:var(--muted)}
 #tier{color:#c77dff;font-size:12px;letter-spacing:.1em;margin-left:4px}
 @keyframes pop{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
-@media (prefers-reduced-motion:reduce){#toast{transition:none}#lvup{animation:none}}
+/* yatay telefon: kısa ekranda HUD'u sıkıştır */
+@media (max-height:520px) and (orientation:landscape){
+  #stats{width:150px;padding:6px 10px}#stats .lv{font-size:15px}.bar{height:6px;margin:3px 0 1px}.row{font-size:11px}
+  #board{width:150px;padding:6px 10px;font-size:11px}#board ol{gap:1px}#board h3{margin-bottom:3px}
+  #mini{width:96px;height:96px}
+  #turretBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px));font-size:12px;padding:9px 12px}
+  #joy{width:116px;height:116px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  #lvup{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 300px));padding:6px}
+  .card{padding:5px 4px}.card .d{display:none}.lvhead{margin-bottom:4px}
+  .overlay{align-items:flex-start;overflow-y:auto}.box{padding:14px}.box ul{font-size:12px;line-height:1.4;margin:4px 0 8px}
+}
+#rotate{display:none;z-index:6;flex-direction:column}
+@media (orientation:portrait) and (pointer:coarse){#rotate:not(.skip){display:flex}}
+.phone{width:46px;height:80px;border:3px solid var(--accent);border-radius:9px;margin:0 auto 14px;animation:turn 2s ease-in-out infinite}
+@keyframes turn{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(-90deg)}}
+.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;border:1px solid var(--line);font-size:13px;margin-top:10px}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}#lvup{animation:none}.phone{animation:none;transform:rotate(-90deg)}}
 </style>
 
 <canvas id="c"></canvas>
@@ -93,6 +109,14 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 <div id="joy" aria-label="Yön joystick'i"><div id="knob"></div></div>
 <div class="hud" id="toast"></div>
 
+<div class="overlay" id="rotate">
+  <div class="box">
+    <div class="phone"></div>
+    <h2>Telefonu yan çevir</h2>
+    <p>Alan Avcısı yatay ekranda daha rahat oynanır: sol başparmak joystick, sağ başparmak taret.</p>
+    <button class="btn ghost" id="rotSkip" type="button">Dikey devam et</button>
+  </div>
+</div>
 <div class="overlay" id="start">
   <div class="box">
     <h1>ALAN AVCISI</h1>
@@ -345,6 +369,9 @@ cv.addEventListener('pointerup',ev=>{if(ev.pointerType!=='mouse')ptr.active=fals
 cv.addEventListener('pointercancel',()=>{ptr.active=false});
 $('turretBtn').addEventListener('click',()=>{if(!paused)placeTurret(player)});
 $('play').onclick=startGame;
+const rotMQ=matchMedia('(orientation:portrait) and (pointer:coarse)');
+$('rotSkip').onclick=()=>$('rotate').classList.add('skip');
+const rotBlocking=()=>rotMQ.matches&&!$('rotate').classList.contains('skip');
 $('again').onclick=()=>{$('dead').hidden=true;resetEnt(player,1);spawn(player);paused=false};
 
 function playerDir(){
@@ -365,7 +392,7 @@ function update(dt){
     if(!e.alive){if(e.isBot){e.respawn-=dt;if(e.respawn<=0){resetEnt(e,e.keep||1);spawn(e)}}continue}
     e.r=15+Math.min(9,(e.level-1)*.45);e.hr=15+Math.min(4,(e.level-1)*.2); // isabet alanı görüntü kadar büyümez
     const dir=e.isBot?botThink(e,dt):playerDir();
-    const onOwn=ownerAt(e.x,e.y)===e.id, sp=e.stats.speed*(onOwn?1.08:1);
+    const onOwn=ownerAt(e.x,e.y)===e.id, sp=e.stats.speed*(onOwn?1.08:1)*Math.max(.68,1-(e.level-1)*.02); // büyüdükçe yavaşlar
     e.x=clamp(e.x+dir.x*sp*dt,e.r,WW-e.r);e.y=clamp(e.y+dir.y*sp*dt,e.r,WH-e.r);
     if(dir.x||dir.y)e.moveAng=Math.atan2(dir.y,dir.x);
     paintCircle(e.x,e.y,e.stats.paint,e.id,false);
@@ -480,7 +507,7 @@ function drawMini(){
 let last=performance.now();
 function loop(t){
   const dt=Math.min(.05,(t-last)/1000);last=t;
-  if(started&&!paused)update(dt);
+  if(started&&!paused&&!rotBlocking())update(dt);
   if(started){draw(t);if(frame++%8===0){hud();drawMini()}}
   if(toastT>0){toastT-=dt;if(toastT<=0)$('toast').style.opacity=0}
   requestAnimationFrame(loop);
@@ -501,6 +528,9 @@ function initWorld(){
 function startGame(){
   const n=$('nick').value.trim();player.name=n||'Sen';
   $('start').hidden=true;paused=false;started=true;$('nick').blur();
+  // mümkünse tam ekran + yatay kilit (desteklemeyen cihazlarda sessizce geçer)
+  if(matchMedia('(pointer:coarse)').matches){try{const de=document.documentElement;const p=de.requestFullscreen?de.requestFullscreen():null;
+    if(p&&p.then)p.then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{})}catch(e){}}
 }
 initWorld();
 cam.x=player.x-W/scale/2;cam.y=player.y-H/scale/2;started=true;draw(0);started=false;
