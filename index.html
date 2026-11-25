@@ -56,22 +56,28 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
   background:#0b1119;color:var(--fg);margin-bottom:12px;-webkit-user-select:text;user-select:text}
 .btn{font:700 16px var(--display);letter-spacing:.06em;background:var(--accent);color:#1a1300;border:0;border-radius:10px;
   padding:12px 22px;cursor:pointer;box-shadow:0 3px 0 #a07c10}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-@media (max-width:520px){.cards{grid-template-columns:1fr}#board{width:140px}#stats{width:170px}#mini{width:110px;height:110px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+@media (max-width:520px){#lvup{width:calc(100% - 32px);bottom:calc(184px + env(safe-area-inset-bottom,0px))}.card .d{font-size:10.5px}#board{width:140px}#stats{width:170px}#mini{width:110px;height:110px}
   #turretBtn{bottom:calc(134px + env(safe-area-inset-bottom,0px));font-size:12px;padding:10px 12px}#joy{width:124px;height:124px}}
-.card{background:#0b1119;border:1px solid var(--line);border-radius:10px;padding:14px 10px;cursor:pointer;color:var(--fg);font:inherit;text-align:center}
+.card{background:#0b1119;border:1px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;color:var(--fg);font:inherit;text-align:center}
 .card:hover{border-color:var(--accent)}
-.card .ic{font:700 22px var(--display);color:var(--accent)}
-.card .t{font:700 14px var(--display);margin:6px 0 4px;letter-spacing:.03em}
+.card .ic{font:700 18px var(--display);color:var(--accent)}
+.card .t{font:700 13px var(--display);margin:3px 0 2px;letter-spacing:.03em}
 .card .d{font-size:12px;color:var(--muted)}
 .kbd{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:12px;color:var(--fg)}
-@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+#lvup{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:4;
+  width:min(520px,calc(100% - 340px));box-sizing:border-box;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:8px;animation:pop .25s ease-out}
+.lvhead{font:700 12px var(--display);letter-spacing:.08em;color:var(--accent);text-align:center;margin-bottom:6px}
+.lvhead span{color:var(--muted)}
+#tier{color:#c77dff;font-size:12px;letter-spacing:.1em;margin-left:4px}
+@keyframes pop{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}#lvup{animation:none}}
 </style>
 
 <canvas id="c"></canvas>
 
 <div class="hud" id="stats">
-  <div class="lv">SEVİYE <span id="lv">1</span></div>
+  <div class="lv">SEVİYE <span id="lv">1</span><span id="tier"></span></div>
   <div class="bar"><i id="hpBar"></i></div>
   <div class="row"><span>Can</span><b id="hpT">100/100</b></div>
   <div class="bar"><i id="xpBar"></i></div>
@@ -102,12 +108,9 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
   </div>
 </div>
 
-<div class="overlay" id="lvup" hidden>
-  <div class="box" style="max-width:560px">
-    <h2>Seviye atladın</h2>
-    <p>Bir güçlendirme seç <span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span></p>
-    <div class="cards" id="cards"></div>
-  </div>
+<div id="lvup" hidden>
+  <div class="lvhead">SEVİYE ATLADIN · GÜÇ SEÇ (1 2 3) <span id="lvPend"></span></div>
+  <div class="cards" id="cards"></div>
 </div>
 
 <div class="overlay" id="dead" hidden>
@@ -194,7 +197,31 @@ function collect(e,o){
   burst(o.x,o.y,o.type==='gold'?'#ffcc33':o.type==='big'?'#c77dff':'#5be37d',6);
 }
 function gainXp(e,xp){e.xp+=xp;while(e.xp>=e.xpNext){e.xp-=e.xpNext;e.level++;e.xpNext=Math.floor(e.xpNext*1.3+6);
-  if(e.isBot)levelUp(e,true);else{e.pending++;e.hp=Math.min(e.stats.maxHp,e.hp+20)}}}
+  if(e.isBot)levelUp(e,true);else{e.pending++;e.hp=Math.min(e.stats.maxHp,e.hp+20);
+    if(tierOf(e.level)!==tierOf(e.level-1)){toast(`Evrim: ${TIERS[tierOf(e.level)]}`,'#c77dff');burst(e.x,e.y,'#c77dff',40)}}}}
+
+/* ---------- evrim: seviyeye göre şekil ---------- */
+const TIERS=['Çaylak','Asker','Savaşçı','Komutan','Efsane'];
+function tierOf(l){return l<3?0:l<6?1:l<10?2:l<15?3:4}
+function poly(x,y,r,n,rot){ctx.beginPath();for(let k=0;k<n;k++){const a=rot+k*6.283/n;ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r)}ctx.closePath()}
+function star(x,y,r,n,rot){ctx.beginPath();for(let k=0;k<n*2;k++){const a=rot+k*Math.PI/n,rr=k%2?r*.58:r;ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr)}ctx.closePath()}
+function drawBody(e,time){
+  const t=tierOf(e.level),x=e.x,y=e.y,r=e.r,spin=time*.0012;
+  if(t>=3){ctx.globalAlpha=.22+Math.sin(time*.005)*.08;ctx.fillStyle=e.color;ctx.beginPath();ctx.arc(x,y,r+12+(t-3)*6,0,6.283);ctx.fill();ctx.globalAlpha=1}
+  if(t>=2){ctx.fillStyle='#c9d3e0';const n=t>=4?10:t>=3?8:6;
+    for(let k=0;k<n;k++){const a=spin*(t>=4?2:1)+k*6.283/n;ctx.beginPath();
+      ctx.moveTo(x+Math.cos(a-.2)*r*.95,y+Math.sin(a-.2)*r*.95);ctx.lineTo(x+Math.cos(a)*(r+9),y+Math.sin(a)*(r+9));ctx.lineTo(x+Math.cos(a+.2)*r*.95,y+Math.sin(a+.2)*r*.95);ctx.fill()}}
+  ctx.fillStyle=e.hitFlash>0?'#fff':e.color;ctx.strokeStyle='#0d1117';ctx.lineWidth=3;
+  if(t===0){ctx.beginPath();ctx.arc(x,y,r,0,6.283)}
+  else if(t===1)poly(x,y,r*1.15,4,Math.PI/4+e.angle);
+  else if(t===2)poly(x,y,r*1.1,5,e.angle);
+  else if(t===3)poly(x,y,r*1.08,6,e.angle);
+  else star(x,y,r*1.3,6,spin*.6);
+  ctx.fill();ctx.stroke();
+  const arm=Math.round((e.stats.maxHp-100)/30);
+  if(arm>0){ctx.strokeStyle='rgba(232,238,247,.6)';ctx.lineWidth=Math.min(5,1+arm);ctx.beginPath();ctx.arc(x,y,r*.62,0,6.283);ctx.stroke()}
+  if(t>=4){ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(x,y,r*.45,0,6.283);ctx.fill()}
+}
 
 /* ---------- güçlendirmeler ---------- */
 const UPG=[
@@ -211,14 +238,14 @@ function pickUpg(e,n){const pool=UPG.filter(u=>u.ok(e));const out=[];while(out.l
 function levelUp(e,auto){if(auto){const u=pickUpg(e,1)[0];if(u)u.f(e)}}
 let lvChoices=[];
 function showLevelUp(){
-  lvChoices=pickUpg(player,3);paused=true;const box=$('cards');box.innerHTML='';
+  lvChoices=pickUpg(player,3);$('lvPend').textContent=player.pending>1?`+${player.pending-1} hak daha`:'';const box=$('cards');box.innerHTML='';
   lvChoices.forEach((u,i)=>{const b=document.createElement('button');b.className='card';b.type='button';
     b.innerHTML=`<div class="ic">${u.ic}</div><div class="t">${i+1}. ${u.n}</div><div class="d">${u.d}</div>`;
     b.onclick=()=>chooseUpg(i);box.appendChild(b)});
   $('lvup').hidden=false;
 }
 function chooseUpg(i){const u=lvChoices[i];if(!u)return;u.f(player);player.pending--;$('lvup').hidden=true;lvChoices=[];
-  if(player.pending>0)showLevelUp();else paused=false}
+  if(player.pending>0)showLevelUp()}
 
 /* ---------- taretler ---------- */
 function myTurrets(e){let n=0;for(const t of turrets)if(t.owner===e)n++;return n}
@@ -257,7 +284,7 @@ function kill(v,killer){
   turrets=turrets.filter(t=>t.owner!==v);clearTerritory(v.id);
   if(killer&&killer.alive!==undefined){killer.kills++;gainXp(killer,10+v.level*4);killer.gold+=5+v.level;
     if(killer===player)toast(`${v.name} vuruldu!`,'#5be37d')}
-  if(v===player){paused=true;$('deadT').textContent=killer?`${killer.name} seni vurdu`:'Vuruldun';
+  if(v===player){paused=true;$('lvup').hidden=true;lvChoices=[];$('deadT').textContent=killer?`${killer.name} seni vurdu`:'Vuruldun';
     $('deadS').textContent=`Seviye ${v.level} · ${v.kills} leş · en geniş alan %${v.best.toFixed(1)}`;$('dead').hidden=false}
   else{v.respawn=3+Math.random()*2;v.keep=Math.max(1,Math.floor(v.level*.5))}
 }
@@ -334,6 +361,7 @@ function update(dt){
 
   for(const e of ents){
     if(!e.alive){if(e.isBot){e.respawn-=dt;if(e.respawn<=0){resetEnt(e,e.keep||1);spawn(e)}}continue}
+    e.r=15+Math.min(9,(e.level-1)*.45);
     const dir=e.isBot?botThink(e,dt):playerDir();
     const onOwn=ownerAt(e.x,e.y)===e.id, sp=e.stats.speed*(onOwn?1.08:1);
     e.x=clamp(e.x+dir.x*sp*dt,e.r,WW-e.r);e.y=clamp(e.y+dir.y*sp*dt,e.r,WH-e.r);
@@ -418,11 +446,10 @@ function draw(time){
     ctx.save();ctx.translate(e.x,e.y);ctx.rotate(e.angle);
     const n=e.stats.barrels;for(let k=0;k<n;k++){ctx.save();ctx.rotate((k-(n-1)/2)*.13);ctx.fillStyle='#c9d3e0';ctx.fillRect(4,-3.5,e.r+10,7);ctx.restore()}
     ctx.restore();
-    ctx.fillStyle=e.hitFlash>0?'#fff':e.color;ctx.strokeStyle='#0d1117';ctx.lineWidth=3;
-    ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,6.283);ctx.fill();ctx.stroke();
+    drawBody(e,time);const top=e.r+(tierOf(e.level)>=2?10:0)+(tierOf(e.level)>=4?6:0);
     ctx.fillStyle='#0d1117';ctx.font='700 11px "Chakra Petch",sans-serif';ctx.fillText(e.level,e.x,e.y+4);
-    ctx.fillStyle='#e8eef7';ctx.font='500 12px Rubik,sans-serif';ctx.fillText(e.name,e.x,e.y-e.r-12);
-    ctx.fillStyle='#000a';ctx.fillRect(e.x-18,e.y-e.r-8,36,4);ctx.fillStyle=e.hp/e.stats.maxHp>.35?'#5be37d':'#ff5a5a';ctx.fillRect(e.x-18,e.y-e.r-8,36*e.hp/e.stats.maxHp,4)}
+    ctx.fillStyle='#e8eef7';ctx.font='500 12px Rubik,sans-serif';ctx.fillText(e.name,e.x,e.y-top-12);
+    ctx.fillStyle='#000a';ctx.fillRect(e.x-18,e.y-top-8,36,4);ctx.fillStyle=e.hp/e.stats.maxHp>.35?'#5be37d':'#ff5a5a';ctx.fillRect(e.x-18,e.y-top-8,36*e.hp/e.stats.maxHp,4)}
   for(const p of parts){ctx.globalAlpha=Math.max(0,p.life*2);ctx.fillStyle=p.c;ctx.fillRect(p.x-2,p.y-2,4,4)}ctx.globalAlpha=1;
   ctx.font='700 13px "Chakra Petch",sans-serif';
   for(const t of texts){ctx.globalAlpha=Math.max(0,t.life);ctx.fillStyle=t.c;ctx.fillText(t.s,t.x,t.y)}ctx.globalAlpha=1;
@@ -431,7 +458,7 @@ function draw(time){
 let frame=0;
 function hud(){
   const p=player;
-  $('lv').textContent=p.level;$('hpBar').style.width=(100*p.hp/p.stats.maxHp)+'%';$('hpT').textContent=`${Math.ceil(p.hp)}/${p.stats.maxHp}`;
+  $('lv').textContent=p.level;$('tier').textContent=TIERS[tierOf(p.level)].toLocaleUpperCase('tr');$('hpBar').style.width=(100*p.hp/p.stats.maxHp)+'%';$('hpT').textContent=`${Math.ceil(p.hp)}/${p.stats.maxHp}`;
   $('xpBar').style.width=(100*p.xp/p.xpNext)+'%';$('xpT').textContent=`${p.xp}/${p.xpNext}`;
   $('gold').textContent=p.gold;$('area').textContent=(counts[p.id]/(GW*GH)*100).toFixed(1)+'%';
   $('tur').textContent=`${myTurrets(p)}/${p.stats.turretMax}`;$('kills').textContent=p.kills;
