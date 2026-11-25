@@ -33,7 +33,11 @@ canvas#c{position:fixed;inset:0;display:block;width:100%;height:100%}
 #board li.me{color:var(--accent);font-weight:700}
 #mini{bottom:calc(12px + env(safe-area-inset-bottom,0px));right:max(12px,env(safe-area-inset-right,0px));
   border:1px solid var(--line);border-radius:8px;background:#0a0e14;width:150px;height:150px;image-rendering:pixelated}
-#turretBtn{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:max(12px,env(safe-area-inset-left,0px));
+#joy{position:fixed;left:calc(max(16px,env(safe-area-inset-left,0px)) + 6px);bottom:calc(22px + env(safe-area-inset-bottom,0px));
+  width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.2);touch-action:none;z-index:3;cursor:grab}
+#knob{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;
+  background:rgba(255,204,51,.88);box-shadow:0 2px 10px rgba(0,0,0,.5);pointer-events:none}
+#turretBtn{position:fixed;bottom:calc(174px + env(safe-area-inset-bottom,0px));right:max(12px,env(safe-area-inset-right,0px));z-index:3;
   font:700 14px var(--display);letter-spacing:.06em;color:#1a1300;background:var(--accent);border:0;border-radius:10px;
   padding:12px 16px;cursor:pointer;box-shadow:0 3px 0 #a07c10}
 #turretBtn:disabled{background:#3a4150;color:var(--muted);box-shadow:none;cursor:default}
@@ -53,7 +57,8 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 .btn{font:700 16px var(--display);letter-spacing:.06em;background:var(--accent);color:#1a1300;border:0;border-radius:10px;
   padding:12px 22px;cursor:pointer;box-shadow:0 3px 0 #a07c10}
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-@media (max-width:520px){.cards{grid-template-columns:1fr}#board{width:140px}#stats{width:170px}#mini{width:110px;height:110px}}
+@media (max-width:520px){.cards{grid-template-columns:1fr}#board{width:140px}#stats{width:170px}#mini{width:110px;height:110px}
+  #turretBtn{bottom:calc(134px + env(safe-area-inset-bottom,0px));font-size:12px;padding:10px 12px}#joy{width:124px;height:124px}}
 .card{background:#0b1119;border:1px solid var(--line);border-radius:10px;padding:14px 10px;cursor:pointer;color:var(--fg);font:inherit;text-align:center}
 .card:hover{border-color:var(--accent)}
 .card .ic{font:700 22px var(--display);color:var(--accent)}
@@ -79,6 +84,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 <div class="hud" id="board"><h3>Alan Sıralaması</h3><ol id="boardList"></ol></div>
 <canvas class="hud" id="mini" width="120" height="120"></canvas>
 <button id="turretBtn" type="button">TARET KUR · 15</button>
+<div id="joy" aria-label="Yön joystick'i"><div id="knob"></div></div>
 <div class="hud" id="toast"></div>
 
 <div class="overlay" id="start">
@@ -86,8 +92,8 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
     <h1>ALAN AVCISI</h1>
     <p>Gezdiğin her kare senin olur. Alanına düşen her şeyi makinalı tüfeğin kendiliğinden toplar.</p>
     <ul>
-      <li><b>Hareket:</b> fare / dokunma yönü ya da <span class="kbd">WASD</span></li>
-      <li><b>Taret:</b> <span class="kbd">Boşluk</span> ya da sol alttaki düğme. Kendi alanında kurulur, alanını savunur ve toplar.</li>
+      <li><b>Hareket:</b> sol alttaki joystick, fare ya da <span class="kbd">WASD</span></li>
+      <li><b>Taret:</b> <span class="kbd">Boşluk</span> ya da sağdaki düğme. Kendi alanında kurulur, alanını savunur ve toplar.</li>
       <li><b>Güçlen:</b> yeşil küre deneyim, sarı altın, mor küre ikisinden de çok verir.</li>
       <li><b>Rakipler</b> de aynısını yapıyor. Onları vur, alanları boşa düşsün.</li>
     </ul>
@@ -136,7 +142,7 @@ const cellAt=(x,y)=>{const cx=x/CELL|0, cy=y/CELL|0; return (cx<0||cy<0||cx>=GW|
 const ownerAt=(x,y)=>{const i=cellAt(x,y);return i<0?0:owner[i]};
 
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;
-  scale=clamp(Math.min(W,H)/720,.62,1.1)}
+  scale=clamp(Math.min(W,H)/560,.8,1.1)}
 addEventListener('resize',resize); resize();
 
 /* ---------- varlıklar ---------- */
@@ -296,7 +302,16 @@ addEventListener('keydown',ev=>{if(ev.target.tagName==='INPUT'){if(ev.key==='Ent
   if(!$('lvup').hidden&&'123'.includes(ev.key))chooseUpg(+ev.key-1)});
 addEventListener('keyup',ev=>{keys[ev.key.toLowerCase()]=false});
 cv.addEventListener('pointermove',ev=>{ptr.x=ev.clientX;ptr.y=ev.clientY;if(ev.pointerType==='mouse')ptr.active=true});
-cv.addEventListener('pointerdown',ev=>{ptr.x=ev.clientX;ptr.y=ev.clientY;ptr.active=true});
+cv.addEventListener('pointerdown',ev=>{if(ev.pointerType!=='mouse')return;ptr.x=ev.clientX;ptr.y=ev.clientY;ptr.active=true});
+// sanal joystick
+const joy=$('joy'),knob=$('knob'),jv={x:0,y:0,id:null};
+function joyMove(ev){const r=joy.getBoundingClientRect(),R=r.width/2,m=R*.7;let dx=ev.clientX-r.left-R,dy=ev.clientY-r.top-R;
+  const l=Math.hypot(dx,dy);if(l>m){dx*=m/l;dy*=m/l}knob.style.transform=`translate(${dx}px,${dy}px)`;
+  const k=Math.hypot(dx,dy)/m;jv.x=k<.12?0:dx/m;jv.y=k<.12?0:dy/m}
+joy.addEventListener('pointerdown',ev=>{ev.preventDefault();jv.id=ev.pointerId;try{joy.setPointerCapture(ev.pointerId)}catch(e){}joyMove(ev)});
+joy.addEventListener('pointermove',ev=>{if(ev.pointerId===jv.id)joyMove(ev)});
+const joyEnd=ev=>{if(ev.pointerId!==jv.id)return;jv.id=null;jv.x=jv.y=0;knob.style.transform=''};
+joy.addEventListener('pointerup',joyEnd);joy.addEventListener('pointercancel',joyEnd);
 cv.addEventListener('pointerup',ev=>{if(ev.pointerType!=='mouse')ptr.active=false});
 cv.addEventListener('pointercancel',()=>{ptr.active=false});
 $('turretBtn').addEventListener('click',()=>{if(!paused)placeTurret(player)});
@@ -307,6 +322,7 @@ function playerDir(){
   let x=0,y=0;
   if(keys.w||keys.arrowup)y--;if(keys.s||keys.arrowdown)y++;if(keys.a||keys.arrowleft)x--;if(keys.d||keys.arrowright)x++;
   if(x||y){const l=Math.hypot(x,y);return {x:x/l,y:y/l}}
+  if(jv.id!==null)return {x:jv.x,y:jv.y};
   if(ptr.active){const dx=ptr.x-W/2,dy=ptr.y-H/2,l=Math.hypot(dx,dy);if(l<14)return {x:0,y:0};const k=Math.min(1,l/120);return {x:dx/l*k,y:dy/l*k}}
   return {x:0,y:0};
 }
