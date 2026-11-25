@@ -113,8 +113,9 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 <div class="overlay" id="start">
   <div class="box">
     <h1>ALAN AVCISI</h1>
-    <p>Gezdiğin her kare senin olur. Alanına düşen her şeyi makinalı tüfeğin kendiliğinden toplar.</p>
+    <p>Gezdiğin her kare senin olur, bir yeri çevrelersen içi de senin olur. Alanına düşen her şeyi makinalı tüfeğin kendiliğinden toplar.</p>
     <ul>
+      <li><b>Çevrele:</b> izinle bir halka çiz, ortası (rakip alanı dahil) bir anda senin olur.</li>
       <li><b>Hareket:</b> sol alttaki joystick, fare ya da <span class="kbd">WASD</span></li>
       <li><b>Taret:</b> <span class="kbd">Boşluk</span> ya da sağdaki düğme. Kendi alanında kurulur, alanını savunur ve toplar.</li>
       <li><b>Güçlen:</b> yeşil küre deneyim, sarı altın, mor küre ikisinden de çok verir.</li>
@@ -204,8 +205,16 @@ function paintCircle(x,y,R,id,force){
     if(dx*dx+dy*dy>r2)continue;const gx=cx+dx,gy=cy+dy;if(gx<0||gy<0||gx>=GW||gy>=GH)continue;
     const i=gy*GW+gx,o=owner[i];if(o===id)continue;
     if(!force&&o!==0&&Math.random()>.14)continue; // rakip alanı ele geçirmek daha yavaş
-    setCell(i,id);}
+    setCell(i,id);dirty[id]=1;}
 }
+/* çevreleme: kenardan ulaşılamayan her kare çevreleyenin olur */
+const dirty=new Uint8Array(COLORS.length),seen=new Uint8Array(GW*GH),queue=new Int32Array(GW*GH);let fillT=0;
+function fillEnclosed(id){
+  seen.fill(0);let h=0,t=0;const push=i=>{if(!seen[i]&&owner[i]!==id){seen[i]=1;queue[t++]=i}};
+  for(let x=0;x<GW;x++){push(x);push((GH-1)*GW+x)}for(let y=0;y<GH;y++){push(y*GW);push(y*GW+GW-1)}
+  while(h<t){const i=queue[h++],x=i%GW;if(x>0)push(i-1);if(x<GW-1)push(i+1);if(i>=GW)push(i-GW);if(i<GW*(GH-1))push(i+GW)}
+  let n=0;for(let i=0;i<owner.length;i++)if(!seen[i]&&owner[i]!==id){setCell(i,id);n++}
+  return n}
 function clearTerritory(id){for(let i=0;i<owner.length;i++)if(owner[i]===id){owner[i]=0}counts[id]=0}
 
 /* ---------- küreler ---------- */
@@ -408,6 +417,9 @@ function update(dt){
     for(let i=orbs.length-1;i>=0;i--){const o=orbs[i];if((o.x-e.x)**2+(o.y-e.y)**2<(e.r+o.r)**2){collect(e,o);orbs[i]=orbs[orbs.length-1];orbs.pop()}}
     const share=counts[e.id]/(GW*GH)*100;if(share>e.best)e.best=share;
   }
+  fillT-=dt;if(fillT<=0){fillT=.2;for(const e of ents){if(!e.alive||!dirty[e.id])continue;dirty[e.id]=0;
+    const n=fillEnclosed(e.id);if(n>0){gainXp(e,Math.ceil(n/6));burst(e.x,e.y,e.color,Math.min(40,10+n/4));
+      if(e===player)toast(`+${n} kare çevreledin!`,'#ffcc33')}}}
   // taretler
   for(let i=turrets.length-1;i>=0;i--){const t=turrets[i];
     if(ownerAt(t.x,t.y)!==t.owner.id||t.hp<=0){burst(t.x,t.y,t.owner.color,16);turrets.splice(i,1);continue}
