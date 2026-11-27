@@ -60,7 +60,15 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
   background:var(--inp,#0b1119);color:var(--fg);margin-bottom:12px;-webkit-user-select:text;user-select:text}
 .btn{font:700 16px var(--display);letter-spacing:.06em;background:var(--accent);color:#1a1300;border:0;border-radius:10px;
   padding:12px 22px;cursor:pointer;box-shadow:0 3px 0 #a07c10}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.card .v{font:700 11px var(--display);color:var(--fg);opacity:.75;margin-top:2px;font-variant-numeric:tabular-nums}
+.card:disabled{opacity:.4;cursor:default}.card:disabled:hover{border-color:var(--line)}
+#game.compact .cards,#game.narrow .cards{grid-template-columns:repeat(5,1fr);gap:4px}
+#game.compact .card .t,#game.narrow .card .t{font-size:10.5px;letter-spacing:0;margin:1px 0}
+#game.compact .card .ic,#game.narrow .card .ic{font-size:14px}#game.compact .card .v,#game.narrow .card .v{font-size:10px;margin-top:0}
+#game.narrow .card .d{display:none}#game.narrow .card{padding:5px 2px}
+.card .sn{display:none}#game.compact .card .ln,#game.narrow .card .ln{display:none}#game.compact .card .sn,#game.narrow .card .sn{display:inline}
+#game.compact .card .ic,#game.narrow .card .ic{line-height:1.1}#game.compact .card{padding:3px 2px;border-radius:7px}
 #game.narrow #lvup{width:calc(100% - 32px);bottom:calc(184px + env(safe-area-inset-bottom,0px))}#game.narrow .card .d{font-size:10.5px}#game.narrow #board{width:140px}#game.narrow #stats{width:170px}#game.narrow #mini{width:110px;height:110px}
 #game.narrow #turretBtn{bottom:calc(134px + env(safe-area-inset-bottom,0px));font-size:12px;padding:10px 12px}#game.narrow #joy{width:124px;height:124px}
 #game.narrow #dashBtn{right:calc(max(12px,env(safe-area-inset-right,0px)) + 122px);width:60px;height:60px}
@@ -71,7 +79,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 .card .d{font-size:12px;color:var(--muted)}
 .kbd{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:12px;color:var(--fg)}
 #lvup{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:4;
-  width:min(520px,calc(100% - 440px));box-sizing:border-box;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:8px;animation:pop .25s ease-out}
+  width:min(640px,calc(100% - 440px));box-sizing:border-box;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:8px;animation:pop .25s ease-out}
 .lvhead{font:700 12px var(--display);letter-spacing:.08em;color:var(--accent);text-align:center;margin-bottom:6px}
 .lvhead span{color:var(--muted)}
 #tier{color:#c77dff;font-size:12px;letter-spacing:.1em;margin-left:4px}
@@ -83,8 +91,8 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
   #game.compact #dashBtn{right:calc(max(12px,env(safe-area-inset-right,0px)) + 108px);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:62px;height:62px;font-size:13px}
   #game.compact #turretBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px));font-size:12px;padding:9px 12px}
   #game.compact #joy{width:116px;height:116px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-  #game.compact #lvup{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 400px));padding:6px}
-  #game.compact .card{padding:5px 4px}#game.compact .card .d{display:none}#game.compact .lvhead{margin-bottom:4px}
+  #game.compact #lvup{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(520px,calc(100% - 380px));padding:6px}
+  #game.compact .card{padding:4px 2px}#game.compact .card .d{display:none}#game.compact .lvhead{margin-bottom:4px}
   #game.compact .overlay{align-items:flex-start;overflow-y:auto}#game.compact .box{padding:14px}#game.compact .box ul{font-size:12px;line-height:1.4;margin:4px 0 8px}
 #game{position:fixed;inset:0;overflow:hidden;color:var(--fg)}
 #game.rot{inset:auto;top:0;left:0;transform-origin:0 0}
@@ -161,7 +169,7 @@ input#nick{width:100%;box-sizing:border-box;font:500 16px var(--body);padding:11
 </div>
 
 <div id="lvup" hidden>
-  <div class="lvhead">SEVİYE ATLADIN · GÜÇ SEÇ (1 2 3) <span id="lvPend"></span></div>
+  <div class="lvhead">SEVİYE ATLADIN · GÜÇ SEÇ (1–9) <span id="lvPend"></span></div>
   <div class="cards" id="cards"></div>
 </div>
 
@@ -308,17 +316,20 @@ const UPG=[
   {k:'turret',ic:'⌂',n:'Ek Taret',d:'+1 taret hakkı',ok:e=>e.stats.turretMax<6,f:e=>e.stats.turretMax++},
   {k:'tlv',ic:'⌂+',n:'Taret Ustası',d:'Tüm taretler +1 seviye',ok:e=>e.stats.turretLv<5,f:e=>{e.stats.turretLv++;for(const t of turrets)if(t.owner===e){const m=turretHp(e);t.hp+=m-t.maxHp;t.maxHp=m}}},
 ];
+const UPS={fire:'Hız',range:'Menzil',dmg:'Hasar',speed:'Çeviklik',paint:'İz',hp:'Zırh',barrels:'Namlu',turret:'+Taret',tlv:'Taret Sv'};
+const UPV={fire:e=>e.stats.fire.toFixed(1)+'/sn',range:e=>Math.round(e.stats.range),dmg:e=>Math.round(e.stats.dmg),speed:e=>Math.round(e.stats.speed),
+  paint:e=>e.stats.paint+'/6',hp:e=>e.stats.maxHp,barrels:e=>e.stats.barrels+'/5',turret:e=>e.stats.turretMax+'/6',tlv:e=>e.stats.turretLv+'/5'};
 function pickUpg(e,n){const pool=UPG.filter(u=>u.ok(e));const out=[];while(out.length<n&&pool.length){out.push(pool.splice(Math.random()*pool.length|0,1)[0])}return out}
 function levelUp(e,auto){if(auto){const u=pickUpg(e,1)[0];if(u)u.f(e)}}
 let lvChoices=[];
 function showLevelUp(){
-  lvChoices=pickUpg(player,3);$('lvPend').textContent=player.pending>1?`+${player.pending-1} hak daha`:'';const box=$('cards');box.innerHTML='';
-  lvChoices.forEach((u,i)=>{const b=document.createElement('button');b.className='card';b.type='button';
-    b.innerHTML=`<div class="ic">${u.ic}</div><div class="t">${i+1}. ${u.n}</div><div class="d">${u.d}</div>`;
+  lvChoices=UPG.slice();$('lvPend').textContent=player.pending>1?`+${player.pending-1} hak daha`:'';const box=$('cards');box.innerHTML='';
+  lvChoices.forEach((u,i)=>{const b=document.createElement('button');b.className='card';b.type='button';const ok=u.ok(player);b.disabled=!ok;
+    b.innerHTML=`<div class="ic">${u.ic}</div><div class="t"><span class="ln">${i+1}. ${u.n}</span><span class="sn">${i+1}. ${UPS[u.k]}</span></div><div class="d">${u.d}</div><div class="v">${ok?UPV[u.k](player):'MAKS'}</div>`;
     b.onclick=()=>chooseUpg(i);box.appendChild(b)});
   $('lvup').hidden=false;
 }
-function chooseUpg(i){const u=lvChoices[i];if(!u)return;u.f(player);player.pending--;$('lvup').hidden=true;lvChoices=[];
+function chooseUpg(i){const u=lvChoices[i];if(!u||!u.ok(player))return;u.f(player);player.pending--;$('lvup').hidden=true;lvChoices=[];
   if(player.pending>0)showLevelUp()}
 
 /* ---------- taretler ---------- */
@@ -402,7 +413,7 @@ addEventListener('keydown',ev=>{if(ev.target.tagName==='INPUT'){if(ev.key==='Ent
   keys[ev.key.toLowerCase()]=true;
   if(ev.code==='Space'){ev.preventDefault();if(!paused)placeTurret(player)}
   if((ev.key==='Shift'||ev.key.toLowerCase()==='e')&&!paused)dash(player);
-  if(!$('lvup').hidden&&'123'.includes(ev.key))chooseUpg(+ev.key-1)});
+  if(!$('lvup').hidden&&/^[1-9]$/.test(ev.key))chooseUpg(+ev.key-1)});
 addEventListener('keyup',ev=>{keys[ev.key.toLowerCase()]=false});
 cv.addEventListener('pointermove',ev=>{ptr.x=ev.clientX;ptr.y=ev.clientY;if(ev.pointerType==='mouse')ptr.active=true});
 cv.addEventListener('pointerdown',ev=>{if(ev.pointerType!=='mouse')return;ptr.x=ev.clientX;ptr.y=ev.clientY;ptr.active=true});
